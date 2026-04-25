@@ -1,0 +1,181 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and monetization data",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "totalViews": { "type": "integer" },
+        "subscriberCount": { "type": "integer" },
+        "earningsBalance": { "type": "number" },
+        "paypalEmail": { "type": "string" },
+        "mppJoinedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Video": {
+      "title": "Video",
+      "description": "Video metadata associated with a YouTube URL",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "category": { "type": "string" },
+        "youtubeUrl": { "type": "string" },
+        "youtubeId": { "type": "string" },
+        "views": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "thumbnail": { "type": "string" }
+      },
+      "required": ["ownerId", "title", "youtubeUrl", "youtubeId", "category"]
+    },
+    "VideoView": {
+      "title": "VideoView",
+      "description": "Record of a unique view",
+      "type": "object",
+      "properties": {
+        "videoId": { "type": "string" },
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["videoId", "userId"]
+    },
+    "Subscription": {
+      "title": "Subscription",
+      "description": "Record of a unique subscription",
+      "type": "object",
+      "properties": {
+        "creatorId": { "type": "string" },
+        "subscriberId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["creatorId", "subscriberId"]
+    },
+    "Like": {
+      "title": "Like",
+      "description": "Record of a unique video like",
+      "type": "object",
+      "properties": {
+        "videoId": { "type": "string" },
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["videoId", "userId"]
+    },
+    "Dislike": {
+      "title": "Dislike",
+      "description": "Record of a unique video dislike",
+      "type": "object",
+      "properties": {
+        "videoId": { "type": "string" },
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["videoId", "userId"]
+    },
+    "Comment": {
+      "title": "Comment",
+      "description": "Record of a video comment",
+      "type": "object",
+      "properties": {
+        "videoId": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userPhoto": { "type": "string" },
+        "content": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["videoId", "userId", "content"]
+    },
+    "WatchLater": {
+      "title": "Watch Later",
+      "description": "User's saved videos for later viewing",
+      "type": "object",
+      "properties": {
+        "videoId": { "type": "string" },
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["videoId", "userId"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Payout record for a user",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "amount": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "completed", "failed"] },
+        "paypalEmail": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "amount", "status", "paypalEmail"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "User notification",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["comment", "subscriber", "payout", "system"] },
+        "read": { "type": "boolean" },
+        "link": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "message", "type", "read", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User records"
+    },
+    "/videos/{videoId}": {
+      "schema": "Video",
+      "description": "Video records"
+    },
+    "/videoViews/{viewId}": {
+      "schema": "VideoView",
+      "description": "Unique view records"
+    },
+    "/subscriptions/{subId}": {
+      "schema": "Subscription",
+      "description": "Unique subscription records"
+    },
+    "/likes/{likeId}": {
+      "schema": "Like",
+      "description": "Unique like records"
+    },
+    "/dislikes/{dislikeId}": {
+      "schema": "Dislike",
+      "description": "Unique dislike records"
+    },
+    "/comments/{commentId}": {
+      "schema": "Comment",
+      "description": "Video comments"
+    },
+    "/watchLater/{watchLaterId}": {
+      "schema": "WatchLater",
+      "description": "User's saved videos"
+    },
+    "/transactions/{transactionId}": {
+      "schema": "Transaction",
+      "description": "Payout history"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "User notifications"
+    },
+    "/admins/{adminId}": {
+      "schema": "object",
+      "description": "System administrators"
+    }
+  }
+}
