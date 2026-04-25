@@ -8,6 +8,7 @@ import { formatViews, formatCurrency, cn } from '../lib/utils';
 import { Share, ThumbsUp, ThumbsDown, Bookmark, MoreHorizontal, Moon, Check, Clock } from 'lucide-react';
 import VideoCard from '../components/video/VideoCard';
 import CommentSection from '../components/video/CommentSection';
+import AdUnit from '../components/ads/AdUnit';
 import { motion, AnimatePresence } from 'motion/react';
 
 enum OperationType {
@@ -517,6 +518,10 @@ export default function Watch() {
             <p className="whitespace-pre-wrap text-white/80 leading-relaxed font-medium tracking-tight">
               {video.description || "No signal metadata provided for this planetary transmission."}
             </p>
+          </div>
+
+          <div className="mt-8 flex justify-center">
+             <AdUnit type="banner" />
           </div>
 
           <CommentSection videoId={videoId || ''} />

@@ -3,6 +3,7 @@ import { collection, query, orderBy, limit, getDocs, where } from 'firebase/fire
 import { db } from '../lib/firebase';
 import { Video, CATEGORIES } from '../types';
 import VideoCard from '../components/video/VideoCard';
+import AdUnit from '../components/ads/AdUnit';
 import { Compass, Zap, Flame, Rocket, Music, Gamepad2, Film, Newspaper, Trophy } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion } from 'motion/react';
@@ -135,6 +136,11 @@ export default function Explore() {
           ))}
         </div>
       )}
+
+      {/* Ad Unit */}
+      <div className="mt-12 flex justify-center">
+        <AdUnit type="banner" />
+      </div>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { db } from '../lib/firebase';
 import { Video, CATEGORIES } from '../types';
 import VideoCard from '../components/video/VideoCard';
 import { Play, Search } from 'lucide-react';
+import AdUnit from '../components/ads/AdUnit';
 import { cn } from '../lib/utils';
 
 import { useSearchParams, useNavigate } from 'react-router-dom';
@@ -123,9 +124,9 @@ export default function Home() {
         </div>
       )}
 
-      {/* Ad Placeholder */}
-      <div className="mt-12 flex h-32 items-center justify-center rounded-2xl border border-neutral-800 bg-neutral-900/30">
-        <p className="text-[10px] uppercase tracking-[0.5em] text-neutral-600 font-bold">Marketing Transmission Node</p>
+      {/* Ad Unit */}
+      <div className="mt-12 flex justify-center">
+        <AdUnit type="banner" />
       </div>
     </div>
   );
