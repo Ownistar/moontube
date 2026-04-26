@@ -11,7 +11,11 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Hardcoded Master Identity - case-insensitive
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    // Hardcoded Master Identity
     function isMasterAdmin() {
       return isSignedIn() && 
              request.auth.token.get('email', '').lower() == "itzluci52@gmail.com";
@@ -31,7 +35,7 @@ service cloud.firestore {
     }
 
     function isValidId(id) {
-      return id is string && id.size() > 0 && id.size() <= 256;
+      return id is string && id.size() > 0 && id.size() <= 256 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
 
     function incoming() {
@@ -45,6 +49,7 @@ service cloud.firestore {
     // --- User Validation ---
     function isValidUser(data) {
       return data.keys().hasAll(['uid', 'email', 'displayName']) &&
+             data.uid == request.auth.uid &&
              data.uid is string && data.uid.size() <= 128 &&
              data.email is string && data.email.size() <= 256 &&
              data.displayName is string && data.displayName.size() <= 100 &&
@@ -55,11 +60,11 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow get: if isSignedIn();
-      allow list: if isSignedIn() && (request.auth.uid == userId || isAdmin()); 
+      allow list: if isSignedIn() && (resource.data.uid == request.auth.uid || isAdmin()); 
       
-      allow create: if isOwner(userId) && isValidUser(incoming()) && incoming().uid == request.auth.uid;
+      allow create: if isVerified() && isOwner(userId) && isValidUser(incoming());
       
-      allow update: if (isOwner(userId) || isAdmin()) && isValidId(userId) && (
+      allow update: if (isVerified() && (isOwner(userId) || isAdmin())) && isValidId(userId) && (
         // Action: Update Profile
         (incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL', 'paypalEmail']) && isValidUser(incoming())) ||
         // Action: Join MPP
@@ -69,8 +74,8 @@ service cloud.firestore {
          incoming().earningsBalance == (existing().earningsBalance - existing().earningsBalance))
       );
       
-      // Stats tracking for creators by viewers (Secure mode: requires view doc in batch)
-      allow update: if isSignedIn() && (
+      // Stats tracking for creators by viewers
+      allow update: if isVerified() && (
         (incoming().diff(existing()).affectedKeys().hasOnly(['totalViews', 'earningsBalance', '_viewForVideoId']) &&
          existsAfter(/databases/$(database)/documents/videoViews/$(incoming().get('_viewForVideoId', 'none') + "_" + request.auth.uid))) ||
         // Action: Subscription tracking
@@ -81,7 +86,7 @@ service cloud.firestore {
     // --- Video Validation ---
     function isValidVideo(data) {
       return data.keys().hasAll(['ownerId', 'title', 'youtubeUrl', 'youtubeId', 'category']) &&
-             data.ownerId is string &&
+             data.ownerId == request.auth.uid &&
              data.category is string &&
              data.title is string && data.title.size() <= 200 &&
              data.youtubeUrl is string && data.youtubeUrl.size() <= 512 &&
@@ -90,55 +95,68 @@ service cloud.firestore {
 
     match /videos/{videoId} {
       allow read: if true;
-      allow create: if isSignedIn() && isValidVideo(incoming()) && incoming().ownerId == request.auth.uid;
-      allow update: if (isOwner(existing().ownerId) || isAdmin()) && (
+      allow create: if isVerified() && isValidVideo(incoming()) && isValidId(videoId);
+      allow update: if isVerified() && (isOwner(existing().ownerId) || isAdmin()) && (
         (incoming().diff(existing()).affectedKeys().hasOnly(['title', 'description', 'thumbnail', 'category'])) ||
         (incoming().diff(existing()).affectedKeys().hasOnly(['views', 'likes', 'dislikes']))
       );
       // Secure tracking update for viewers
-      allow update: if isSignedIn() && (
+      allow update: if isVerified() && (
         (incoming().diff(existing()).affectedKeys().hasOnly(['views']) &&
          existsAfter(/databases/$(database)/documents/videoViews/$(videoId + "_" + request.auth.uid))) ||
         (incoming().diff(existing()).affectedKeys().hasOnly(['likes'])) ||
         (incoming().diff(existing()).affectedKeys().hasOnly(['dislikes']))
       );
-      allow delete: if isOwner(existing().ownerId) || isAdmin();
+      allow delete: if isVerified() && (isOwner(existing().ownerId) || isAdmin());
     }
 
     match /subscriptions/{subId} {
-      allow read: if isSignedIn();
-      allow create, delete: if isSignedIn();
+      allow read: if isSignedIn() && (resource == null || resource.data.subscriberId == request.auth.uid || resource.data.creatorId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.subscriberId == request.auth.uid || resource.data.creatorId == request.auth.uid || isAdmin());
+      allow create, delete: if isVerified() && isValidId(subId);
     }
 
     match /comments/{commentId} {
       allow read: if true;
-      allow create: if isSignedIn();
-      allow delete: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isVerified() && isValidId(commentId);
+      allow delete: if isVerified() && (resource.data.userId == request.auth.uid || isAdmin());
     }
 
     match /watchLater/{watchLaterId} {
-      allow read, create, delete: if isSignedIn();
+      allow get: if isVerified() && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isVerified() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isVerified() && incoming().userId == request.auth.uid && isValidId(watchLaterId);
+      allow delete: if isVerified() && (resource.data.userId == request.auth.uid || isAdmin());
     }
 
     match /userLikes/{likeId} {
-      allow read: if isSignedIn();
-      allow create, delete: if isSignedIn() && (request.auth.uid == request.resource.data.userId || request.auth.uid == resource.data.userId);
+      allow get: if isVerified() && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isVerified() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isVerified() && incoming().userId == request.auth.uid && isValidId(likeId);
+      allow delete: if isVerified() && (resource.data.userId == request.auth.uid || isAdmin());
     }
 
     match /userDislikes/{dislikeId} {
-      allow read: if isSignedIn();
-      allow create, delete: if isSignedIn() && (request.auth.uid == request.resource.data.userId || request.auth.uid == resource.data.userId);
+      allow get: if isVerified() && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isVerified() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isVerified() && incoming().userId == request.auth.uid && isValidId(dislikeId);
+      allow delete: if isVerified() && (resource.data.userId == request.auth.uid || isAdmin());
     }
 
     match /userHistory/{historyId} {
-      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
-      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow get: if isVerified() && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isVerified() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isVerified() && incoming().userId == request.auth.uid && isValidId(historyId);
+      allow update: if isVerified() && existing().userId == request.auth.uid && incoming().userId == request.auth.uid && 
+                   incoming().diff(existing()).affectedKeys().hasOnly(['timestamp']) &&
+                   incoming().videoId == existing().videoId;
+      allow delete: if isVerified() && (resource.data.userId == request.auth.uid || isAdmin());
     }
 
     match /videoViews/{viewId} {
-      allow read: if isSignedIn();
-      allow create: if isSignedIn() && request.auth.uid == request.resource.data.userId && !exists(/databases/$(database)/documents/videoViews/$(viewId));
+      allow get: if isVerified() && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isVerified() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isVerified() && incoming().userId == request.auth.uid && !exists(/databases/$(database)/documents/videoViews/$(viewId)) && isValidId(viewId);
     }
 
     // --- Transaction Validation ---
@@ -146,28 +164,33 @@ service cloud.firestore {
       return data.keys().hasAll(['userId', 'amount', 'status', 'paypalEmail', 'createdAt']) &&
              data.userId == request.auth.uid &&
              data.amount is number &&
-             data.status in ['pending', 'completed', 'failed'];
+             data.status in ['pending', 'completed', 'failed'] &&
+             data.createdAt != null;
     }
 
     match /transactions/{transactionId} {
-      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
-      allow create: if isSignedIn();
-      allow update: if isAdmin() && (
-        incoming().diff(existing()).affectedKeys().hasOnly(['status']) ||
-        incoming().diff(existing()).affectedKeys().hasOnly(['status', 'createdAt'])
-      );
+      allow read: if isSignedIn() && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isVerified() && isValidTransaction(incoming()) && isValidId(transactionId);
+      allow update: if isAdmin() && 
+                   existing().status == 'pending' &&
+                   incoming().status in ['completed', 'failed'] &&
+                   (
+                     incoming().diff(existing()).affectedKeys().hasOnly(['status']) ||
+                     incoming().diff(existing()).affectedKeys().hasOnly(['status', 'createdAt'])
+                   );
       allow delete: if isAdmin();
     }
 
     match /admins/{adminId} {
       allow read: if isSignedIn();
-      // Allow syncing admin list if they are a hardcoded master admin or already an admin
       allow write: if isMasterAdmin() || isRegisteredAdmin();
     }
 
     match /notifications/{notificationId} {
-      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow read: if isVerified() && (resource == null || resource.data.userId == request.auth.uid);
+      allow list: if isVerified() && resource.data.userId == request.auth.uid;
+      allow update, delete: if isVerified() && resource.data.userId == request.auth.uid;
     }
   }
 }
