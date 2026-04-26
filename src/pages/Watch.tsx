@@ -373,18 +373,39 @@ export default function Watch() {
     }
   };
 
-  const handleShare = () => {
-    const url = window.location.href;
-    if (navigator.share) {
-      navigator.share({
-        title: video?.title,
-        text: video?.description,
-        url: url
-      }).catch(console.error);
-    } else {
-      navigator.clipboard.writeText(url).then(() => {
+  const handleShare = async () => {
+    const url = `${window.location.origin}/watch/${videoId}`;
+    
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: video?.title,
+          text: video?.description,
+          url: url
+        });
+      } else {
+        throw new Error('Web Share API not supported');
+      }
+    } catch (err) {
+      // Fallback to clipboard if share api fails or not supported
+      try {
+        await navigator.clipboard.writeText(url);
         setShareSuccess(true);
-      });
+      } catch (clipErr) {
+        console.error('Share failed:', clipErr);
+        // Final fallback using execCommand for older browsers or restricted contexts
+        const input = document.createElement('input');
+        input.value = url;
+        document.body.appendChild(input);
+        input.select();
+        try {
+          document.execCommand('copy');
+          setShareSuccess(true);
+        } catch (execErr) {
+          console.error('ExecCommand copy failed:', execErr);
+        }
+        document.body.removeChild(input);
+      }
     }
   };
 
