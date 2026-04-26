@@ -57,10 +57,6 @@ function AppContent() {
     );
   }
 
-  if (!user) {
-    return <Login />;
-  }
-
   return (
     <div className="flex h-screen flex-col bg-[#050505] text-white">
       <Navbar />
@@ -68,17 +64,21 @@ function AppContent() {
         <Sidebar />
         <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
           <Routes>
+            {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/watch/:videoId" element={<Watch />} />
-            <Route path="/upload" element={<Upload />} />
-            <Route path="/mpp" element={<MPPDashboard />} />
-            <Route path="/subscriptions" element={<Subscriptions />} />
-            <Route path="/watch-later" element={<WatchLater />} />
-            <Route path="/history" element={<History />} />
-            <Route path="/liked" element={<LikedVideos />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/profile" element={<Profile />} />
+            
+            {/* Protected Routes */}
+            <Route path="/upload" element={user ? <Upload /> : <Navigate to="/" replace />} />
+            <Route path="/mpp" element={user ? <MPPDashboard /> : <Navigate to="/" replace />} />
+            <Route path="/subscriptions" element={user ? <Subscriptions /> : <Navigate to="/" replace />} />
+            <Route path="/watch-later" element={user ? <WatchLater /> : <Navigate to="/" replace />} />
+            <Route path="/history" element={user ? <History /> : <Navigate to="/" replace />} />
+            <Route path="/liked" element={user ? <LikedVideos /> : <Navigate to="/" replace />} />
+            <Route path="/admin" element={user ? <Admin /> : <Navigate to="/" replace />} />
+            <Route path="/profile" element={user ? <Profile /> : <Navigate to="/" replace />} />
+            
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
