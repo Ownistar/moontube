@@ -5,7 +5,7 @@ import { db } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
 import { Video } from '../types';
 import { formatViews, formatCurrency, cn } from '../lib/utils';
-import { Share, ThumbsUp, ThumbsDown, Bookmark, MoreHorizontal, Moon, Check, Clock } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Bookmark, MoreHorizontal, Moon, Check, Clock } from 'lucide-react';
 import VideoCard from '../components/video/VideoCard';
 import CommentSection from '../components/video/CommentSection';
 import AdUnit from '../components/ads/AdUnit';
@@ -48,7 +48,6 @@ export default function Watch() {
   const [isDisliked, setIsDisliked] = useState(false);
   const [dislikeLoading, setDislikeLoading] = useState(false);
   const [viewChecked, setViewChecked] = useState(false);
-  const [shareSuccess, setShareSuccess] = useState(false);
 
   const [isSaved, setIsSaved] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
@@ -122,13 +121,6 @@ export default function Watch() {
     console.error('Firestore Error: ', JSON.stringify(errInfo));
     // Optional: show user-friendly message
   };
-
-  useEffect(() => {
-    if (shareSuccess) {
-      const timer = setTimeout(() => setShareSuccess(false), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [shareSuccess]);
 
   useEffect(() => {
     setViewChecked(false);
@@ -393,55 +385,6 @@ export default function Watch() {
     }
   };
 
-  const handleShare = async () => {
-    const url = `${window.location.origin}/watch/${videoId}`;
-    
-    try {
-      // Try Web Share API first
-      if (navigator.share) {
-        await navigator.share({
-          title: video?.title,
-          text: video?.description,
-          url: url
-        });
-        return;
-      }
-    } catch (err) {
-      console.warn('Navigator share failed, trying clipboard:', err);
-    }
-
-    // Fallback: Try Clipboard API
-    try {
-      if (navigator.clipboard) {
-        await navigator.clipboard.writeText(url);
-        setShareSuccess(true);
-        return;
-      }
-    } catch (clipErr) {
-      console.error('Clipboard write failed:', clipErr);
-    }
-
-    // Last Resort Fallback: Manual copy support
-    const input = document.createElement('input');
-    input.value = url;
-    document.body.appendChild(input);
-    input.select();
-    input.setSelectionRange(0, 99999); // For mobile devices
-    
-    try {
-      const successful = document.execCommand('copy');
-      if (successful) {
-        setShareSuccess(true);
-      } else {
-        alert(`Failed to auto-copy. Please copy manually: ${url}`);
-      }
-    } catch (execErr) {
-      console.error('execCommand copy failed:', execErr);
-      alert(`Please copy this link: ${url}`);
-    }
-    document.body.removeChild(input);
-  };
-
   if (loading) return <div className="p-8 font-mono animate-pulse text-purple-500">ESTABLISHING ORBITAL UPLINK...</div>;
   if (!video) return <div className="p-8">Lunar static. Video not found.</div>;
 
@@ -494,19 +437,6 @@ export default function Watch() {
             </div>
 
             <div className="flex items-center gap-3 relative">
-              <AnimatePresence>
-                {shareSuccess && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10, scale: 0.9 }}
-                    animate={{ opacity: 1, y: -40, scale: 1 }}
-                    exit={{ opacity: 0, y: -50, scale: 0.9 }}
-                    className="absolute top-0 left-1/2 -translate-x-1/2 whitespace-nowrap bg-purple-600 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg z-50"
-                  >
-                    Link Encrypted & Copied
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
               <div className="flex items-center overflow-hidden rounded-full border border-neutral-800 bg-neutral-900/50 shadow-xl">
                 <motion.button 
                   whileTap={{ scale: 0.9 }}
@@ -546,12 +476,6 @@ export default function Watch() {
                   )}
                 </motion.button>
               </div>
-              <button 
-                onClick={handleShare}
-                className="flex items-center gap-2 rounded-full border border-neutral-800 bg-neutral-900/50 px-6 py-2.5 hover:bg-neutral-800 transition-all text-white/60 hover:text-white shadow-xl"
-              >
-                <Share className="h-4 w-4" /> <span className="text-xs font-bold uppercase tracking-widest">Share</span>
-              </button>
               <div className="relative" ref={menuRef}>
                 <button 
                   onClick={() => setShowMenu(!showMenu)}
