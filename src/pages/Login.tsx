@@ -32,7 +32,7 @@ export default function Login() {
           
           <div className="mt-8 grid grid-cols-3 gap-6 text-center">
             <div>
-              <p className="text-xl font-bold">$0.10</p>
+              <p className="text-xl font-bold">$0.50</p>
               <p className="text-[10px] uppercase tracking-widest text-white/40">Fixed RPM</p>
             </div>
             <div>

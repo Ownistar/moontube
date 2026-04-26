@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Home from './pages/Home';
@@ -16,6 +17,36 @@ import Login from './pages/Login';
 
 function AppContent() {
   const { user, loading } = useAuth();
+
+  useEffect(() => {
+    const now = Date.now();
+
+    // Frequency cap for popunder: 24 hours
+    const POPUNDER_KEY = 'adsterra_popunder_last_shown';
+    const lastPopunder = localStorage.getItem(POPUNDER_KEY);
+    const twentyFourHours = 24 * 60 * 60 * 1000;
+
+    if (!lastPopunder || now - parseInt(lastPopunder) > twentyFourHours) {
+      const script = document.createElement('script');
+      script.src = 'https://accedelid.com/f3/5f/d8/f35fd8f3c65fc113ce4deba181806518.js';
+      script.async = true;
+      document.head.appendChild(script);
+      localStorage.setItem(POPUNDER_KEY, now.toString());
+    }
+
+    // Frequency cap for social bar: 1 hour
+    const SOCIAL_BAR_KEY = 'adsterra_socialbar_last_shown';
+    const lastSocialBar = localStorage.getItem(SOCIAL_BAR_KEY);
+    const oneHour = 60 * 60 * 1000;
+
+    if (!lastSocialBar || now - parseInt(lastSocialBar) > oneHour) {
+      const script = document.createElement('script');
+      script.src = 'https://accedelid.com/36/1a/16/361a16fb9e188d3cf6b5b36adb3d1fe1.js';
+      script.async = true;
+      document.head.appendChild(script);
+      localStorage.setItem(SOCIAL_BAR_KEY, now.toString());
+    }
+  }, []);
 
   if (loading) {
     return (

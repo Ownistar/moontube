@@ -76,7 +76,7 @@ export default function MPPDashboard() {
       <header className="mb-12 flex items-center justify-between">
         <div>
           <h1 className="text-4xl font-black italic tracking-tighter uppercase text-purple-500">Creator Moon Station</h1>
-          <p className="text-white/40">Real-time earnings tracking with fixed $0.10 RPM</p>
+          <p className="text-white/40">Real-time earnings tracking with fixed $0.50 RPM</p>
         </div>
         <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#8B5CF6] text-white shadow-[0_0_40px_rgba(139,92,246,0.3)]">
           <DollarSign className="h-8 w-8" />
@@ -120,6 +120,9 @@ export default function MPPDashboard() {
             {message && <p className={cn("text-center text-xs font-medium", message.includes('success') ? 'text-green-500' : 'text-purple-400')}>{message}</p>}
             <div className="flex flex-col gap-1 items-center">
               <p className="text-center text-[10px] text-white/20">Minimum withdrawal: $50.00 USD</p>
+              <p className="max-w-[280px] text-center text-[10px] leading-relaxed text-white/20">
+                Payment Term: Net-45 (Payments are processed within 45 days of the end of the month in which the threshold was reached).
+              </p>
             </div>
           </div>
         </motion.div>

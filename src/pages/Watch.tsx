@@ -32,7 +32,7 @@ interface FirestoreErrorInfo {
   }
 }
 
-const RPM = 0.10;
+const RPM = 0.50;
 const EARNINGS_PER_VIEW = RPM / 1000;
 
 export default function Watch() {
@@ -90,6 +90,10 @@ export default function Watch() {
   }, [shareSuccess]);
 
   useEffect(() => {
+    setViewChecked(false);
+  }, [videoId]);
+
+  useEffect(() => {
     const fetchVideo = async () => {
       if (!videoId) return;
       try {
@@ -97,35 +101,6 @@ export default function Watch() {
         if (videoDoc.exists()) {
           const data = videoDoc.data() as Video;
           setVideo({ id: videoDoc.id, ...data });
-          
-          // Check for unique view
-          if (user && !viewChecked) {
-            const viewId = `${videoId}_${user.uid}`;
-            const viewRef = doc(db, 'videoViews', viewId);
-            try {
-              const viewSnap = await getDoc(viewRef);
-
-              if (!viewSnap.exists()) {
-                const batch = writeBatch(db);
-                batch.set(viewRef, {
-                  videoId,
-                  userId: user.uid,
-                  createdAt: serverTimestamp()
-                });
-                batch.update(doc(db, 'videos', videoId), {
-                  views: increment(1)
-                });
-                batch.update(doc(db, 'users', data.ownerId), {
-                  totalViews: increment(1),
-                  earningsBalance: increment(EARNINGS_PER_VIEW)
-                });
-                await batch.commit();
-              }
-            } catch (err) {
-              handleFirestoreError(err, OperationType.WRITE, `videoViews/${viewId}`);
-            }
-            setViewChecked(true);
-          }
 
           // Check subscription status
           if (user && data.ownerId) {
@@ -185,7 +160,41 @@ export default function Watch() {
 
     fetchVideo();
     fetchRelated();
-  }, [videoId, user, viewChecked]);
+  }, [videoId, user]);
+
+  useEffect(() => {
+    if (!user || !video || !videoId || viewChecked) return;
+
+    const timer = setTimeout(async () => {
+      const viewId = `${videoId}_${user.uid}`;
+      const viewRef = doc(db, 'videoViews', viewId);
+      try {
+        const viewSnap = await getDoc(viewRef);
+
+        if (!viewSnap.exists()) {
+          const batch = writeBatch(db);
+          batch.set(viewRef, {
+            videoId,
+            userId: user.uid,
+            createdAt: serverTimestamp()
+          });
+          batch.update(doc(db, 'videos', videoId), {
+            views: increment(1)
+          });
+          batch.update(doc(db, 'users', video.ownerId), {
+            totalViews: increment(1),
+            earningsBalance: increment(EARNINGS_PER_VIEW)
+          });
+          await batch.commit();
+        }
+      } catch (err) {
+        handleFirestoreError(err, OperationType.WRITE, `videoViews/${viewId}`);
+      }
+      setViewChecked(true);
+    }, 20000); // 20 seconds delay to count a view
+
+    return () => clearTimeout(timer);
+  }, [user, video, videoId, viewChecked]);
 
   const handleSubscribe = async () => {
     if (!user || !video || video.ownerId === user.uid) return;
