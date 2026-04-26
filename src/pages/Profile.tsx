@@ -4,10 +4,11 @@ import { db } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
 import { Video, CATEGORIES } from '../types';
 import VideoCard from '../components/video/VideoCard';
-import { User, Film, BarChart3, Settings, Edit2, Trash2, X, Check, Save, TrendingUp, Users, Clock, PlayCircle } from 'lucide-react';
+import { User, Film, BarChart3, Settings, Edit2, Trash2, X, Check, Save, TrendingUp, Users, Clock, PlayCircle, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
 import { Link } from 'react-router-dom';
+import { handleFirestoreError, OperationType } from '../lib/firebase';
 
 export default function Profile() {
   const { user, profile } = useAuth();
@@ -83,13 +84,21 @@ export default function Profile() {
     }
   };
 
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
   const handleDeleteVideo = async (videoId: string) => {
-    if (!window.confirm('Delete this video forever?')) return;
+    if (deletingId !== videoId) {
+      setDeletingId(videoId);
+      return;
+    }
+    
     try {
       await deleteDoc(doc(db, 'videos', videoId));
       setVideos(videos.filter(v => v.id !== videoId));
+      setDeletingId(null);
+      setEditingVideo(null);
     } catch (err) {
-      console.error(err);
+      handleFirestoreError(err, OperationType.DELETE, `videos/${videoId}`);
     }
   };
 
@@ -186,9 +195,19 @@ export default function Profile() {
                   </button>
                   <button 
                     onClick={() => handleDeleteVideo(editingVideo!.id)}
-                    className="flex items-center justify-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-8 font-bold text-red-500 hover:bg-red-500/20"
+                    onMouseLeave={() => setDeletingId(null)}
+                    className={cn(
+                      "flex items-center justify-center gap-2 rounded-xl px-8 font-bold transition-all duration-300",
+                      deletingId === editingVideo.id 
+                        ? "bg-red-600 text-white animate-pulse" 
+                        : "border border-red-500/20 bg-red-500/10 text-red-500 hover:bg-red-500/20"
+                    )}
                   >
-                    <Trash2 className="h-4 w-4" /> Delete
+                    {deletingId === editingVideo.id ? (
+                      <><AlertTriangle className="h-4 w-4" /> Final Confirm</>
+                    ) : (
+                      <><Trash2 className="h-4 w-4" /> Delete</>
+                    )}
                   </button>
                 </div>
               </div>
