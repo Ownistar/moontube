@@ -99,6 +99,28 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["userId", "title", "message", "type", "read", "createdAt"]
+    },
+    "UserLike": {
+      "title": "User Like",
+      "description": "User's like on a video",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "videoId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "videoId"]
+    },
+    "HistoryItem": {
+      "title": "History Item",
+      "description": "Record of a user viewing a video",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "videoId": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "videoId", "timestamp"]
     }
   },
   "firestore": {
@@ -121,6 +143,14 @@
     "/watchLater/{watchLaterId}": {
       "schema": "WatchLater",
       "description": "User's saved videos"
+    },
+    "/userLikes/{likeId}": {
+      "schema": "UserLike",
+      "description": "User's video likes"
+    },
+    "/userHistory/{historyId}": {
+      "schema": "HistoryItem",
+      "description": "User's viewing history"
     },
     "/transactions/{transactionId}": {
       "schema": "Transaction",

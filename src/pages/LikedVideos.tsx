@@ -14,20 +14,29 @@ export default function LikedVideos() {
 
   useEffect(() => {
     const fetchLiked = async () => {
-      if (!user) return;
+      if (!user) {
+        setVideos([]);
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       try {
-        const storedLikes = JSON.parse(localStorage.getItem(`likes_${user.uid}`) || '{}');
-        const videoIds = Object.keys(storedLikes);
+        const q = query(
+          collection(db, 'userLikes'),
+          where('userId', '==', user.uid),
+          orderBy('createdAt', 'desc')
+        );
+        const snapshot = await getDocs(q);
         
-        const videoPromises = videoIds.map(async (videoId) => {
-          const videoDoc = await getDoc(doc(db, 'videos', videoId));
+        const videoPromises = snapshot.docs.map(async (likeDoc) => {
+          const likeData = likeDoc.data();
+          const videoDoc = await getDoc(doc(db, 'videos', likeData.videoId));
           if (videoDoc.exists()) {
             return { id: videoDoc.id, ...videoDoc.data() } as Video;
           }
           return null;
         });
-
+        
         const results = await Promise.all(videoPromises);
         setVideos(results.filter((v): v is Video => v !== null));
       } catch (err) {
@@ -53,8 +62,8 @@ export default function LikedVideos() {
           </div>
         </div>
         <div className="rounded-xl border border-purple-500/20 bg-purple-500/5 px-4 py-2">
-          <p className="text-[10px] font-black uppercase tracking-widest text-purple-400">Economical Storage Active</p>
-          <p className="text-[9px] text-purple-300/40">Likes are tracked locally to save cloud space.</p>
+          <p className="text-[10px] font-black uppercase tracking-widest text-purple-400">Cloud Storage Active</p>
+          <p className="text-[9px] text-purple-300/40">Likes are synced across all planetary stations.</p>
         </div>
       </div>
 

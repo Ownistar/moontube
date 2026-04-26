@@ -1,23 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, orderBy, doc, getDoc, limit, deleteDoc, writeBatch } from 'firebase/firestore';
 import { History as HistoryIcon, Trash2 } from 'lucide-react';
-import { db, auth } from '../lib/firebase';
+import { useAuth } from '../context/AuthContext';
+import { db } from '../lib/firebase';
 import { Video } from '../types';
 import VideoCard from '../components/video/VideoCard';
 
 export default function History() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
-  const user = auth.currentUser;
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchHistory = async () => {
-      if (!user) return;
+      if (!user) {
+        setVideos([]);
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       try {
-        const history = JSON.parse(localStorage.getItem(`history_${user.uid}`) || '[]');
-        const videoPromises = history.map(async (item: { id: string }) => {
-          const videoDoc = await getDoc(doc(db, 'videos', item.id));
+        const q = query(
+          collection(db, 'userHistory'),
+          where('userId', '==', user.uid),
+          orderBy('timestamp', 'desc'),
+          limit(50)
+        );
+        const snapshot = await getDocs(q);
+        
+        const videoPromises = snapshot.docs.map(async (historyDoc) => {
+          const historyData = historyDoc.data();
+          const videoDoc = await getDoc(doc(db, 'videos', historyData.videoId));
           if (videoDoc.exists()) {
             return { id: videoDoc.id, ...videoDoc.data() } as Video;
           }
@@ -36,10 +49,20 @@ export default function History() {
     fetchHistory();
   }, [user]);
 
-  const clearHistory = () => {
+  const clearHistory = async () => {
     if (!user) return;
-    localStorage.setItem(`history_${user.uid}`, '[]');
-    setVideos([]);
+    try {
+      const q = query(collection(db, 'userHistory'), where('userId', '==', user.uid));
+      const snapshot = await getDocs(q);
+      const batch = writeBatch(db);
+      snapshot.docs.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+      await batch.commit();
+      setVideos([]);
+    } catch (err) {
+      console.error('Error clearing history:', err);
+    }
   };
 
   if (loading) return <div className="p-8 text-center animate-pulse text-white/50 font-black uppercase tracking-widest text-xs">Initializing data stream...</div>;
@@ -58,8 +81,8 @@ export default function History() {
         </div>
         <div className="flex items-center gap-4 w-full sm:w-auto">
           <div className="rounded-xl border border-purple-500/20 bg-purple-500/5 px-4 py-2 text-left hidden xs:block">
-            <p className="text-[10px] font-black uppercase tracking-widest text-purple-400">Economical Storage Active</p>
-            <p className="text-[9px] text-purple-300/40">History is tracked locally.</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-purple-400">Cloud Storage Active</p>
+            <p className="text-[9px] text-purple-300/40">History is synced across all planetary stations.</p>
           </div>
           <button 
             onClick={clearHistory}

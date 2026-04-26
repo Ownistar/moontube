@@ -56,20 +56,45 @@ export default function Watch() {
   
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Load local interaction state to save storage
+  // Load interaction state from Firestore
   useEffect(() => {
-    if (videoId && user) {
-      const storedLikes = JSON.parse(localStorage.getItem(`likes_${user.uid}`) || '{}');
-      const storedDislikes = JSON.parse(localStorage.getItem(`dislikes_${user.uid}`) || '{}');
-      setIsLiked(!!storedLikes[videoId]);
-      setIsDisliked(!!storedDislikes[videoId]);
+    const fetchInteractions = async () => {
+      if (videoId && user) {
+        // Load Like state
+        const likeId = `${videoId}_${user.uid}`;
+        try {
+          const likeDoc = await getDoc(doc(db, 'userLikes', likeId));
+          setIsLiked(likeDoc.exists());
+        } catch (err) {
+          handleFirestoreError(err, OperationType.GET, `userLikes/${likeId}`);
+        }
 
-      // Save to history
-      const history = JSON.parse(localStorage.getItem(`history_${user.uid}`) || '[]');
-      const filteredHistory = history.filter((v: any) => v.id !== videoId);
-      const newHistory = [{ id: videoId, timestamp: Date.now() }, ...filteredHistory].slice(0, 50);
-      localStorage.setItem(`history_${user.uid}`, JSON.stringify(newHistory));
-    }
+        // Load Dislike state
+        const dislikeId = `${videoId}_${user.uid}`;
+        try {
+          const dislikeDoc = await getDoc(doc(db, 'userDislikes', dislikeId));
+          setIsDisliked(dislikeDoc.exists());
+        } catch (err) {
+          handleFirestoreError(err, OperationType.GET, `userDislikes/${dislikeId}`);
+        }
+
+        // Save to history (Firestore)
+        try {
+          const historyId = `${videoId}_${user.uid}`;
+          await setDoc(doc(db, 'userHistory', historyId), {
+            userId: user.uid,
+            videoId,
+            timestamp: serverTimestamp()
+          });
+        } catch (err) {
+          handleFirestoreError(err, OperationType.CREATE, 'userHistory');
+        }
+      } else if (!user) {
+        setIsLiked(false);
+        setIsDisliked(false);
+      }
+    };
+    fetchInteractions();
   }, [videoId, user]);
 
   useEffect(() => {
@@ -227,27 +252,27 @@ export default function Watch() {
     setLikeLoading(true);
     try {
       const batch = writeBatch(db);
-      const storedLikes = JSON.parse(localStorage.getItem(`likes_${user.uid}`) || '{}');
-      const storedDislikes = JSON.parse(localStorage.getItem(`dislikes_${user.uid}`) || '{}');
+      const likeId = `${videoId}_${user.uid}`;
+      const likeRef = doc(db, 'userLikes', likeId);
+      const dislikeId = `${videoId}_${user.uid}`;
+      const dislikeRef = doc(db, 'userDislikes', dislikeId);
 
       if (isLiked) {
         batch.update(doc(db, 'videos', videoId), {
           likes: increment(-1)
         });
+        batch.delete(likeRef);
         await batch.commit();
         
-        delete storedLikes[videoId];
-        localStorage.setItem(`likes_${user.uid}`, JSON.stringify(storedLikes));
         setIsLiked(false);
         setVideo(prev => prev ? { ...prev, likes: (prev.likes || 1) - 1 } : null);
       } else {
-        // Remove local dislike if it exists
+        // Remove dislike if it exists
         if (isDisliked) {
           batch.update(doc(db, 'videos', videoId), {
             dislikes: increment(-1)
           });
-          delete storedDislikes[videoId];
-          localStorage.setItem(`dislikes_${user.uid}`, JSON.stringify(storedDislikes));
+          batch.delete(dislikeRef);
           setIsDisliked(false);
           setVideo(prev => prev ? { ...prev, dislikes: (prev.dislikes || 1) - 1 } : null);
         }
@@ -255,10 +280,13 @@ export default function Watch() {
         batch.update(doc(db, 'videos', videoId), {
           likes: increment(1)
         });
+        batch.set(likeRef, {
+          userId: user.uid,
+          videoId,
+          createdAt: serverTimestamp()
+        });
         await batch.commit();
         
-        storedLikes[videoId] = true;
-        localStorage.setItem(`likes_${user.uid}`, JSON.stringify(storedLikes));
         setIsLiked(true);
         setVideo(prev => prev ? { ...prev, likes: (prev.likes || 0) + 1 } : null);
       }
@@ -274,27 +302,27 @@ export default function Watch() {
     setDislikeLoading(true);
     try {
       const batch = writeBatch(db);
-      const storedLikes = JSON.parse(localStorage.getItem(`likes_${user.uid}`) || '{}');
-      const storedDislikes = JSON.parse(localStorage.getItem(`dislikes_${user.uid}`) || '{}');
+      const likeId = `${videoId}_${user.uid}`;
+      const likeRef = doc(db, 'userLikes', likeId);
+      const dislikeId = `${videoId}_${user.uid}`;
+      const dislikeRef = doc(db, 'userDislikes', dislikeId);
 
       if (isDisliked) {
         batch.update(doc(db, 'videos', videoId), {
           dislikes: increment(-1)
         });
+        batch.delete(dislikeRef);
         await batch.commit();
 
-        delete storedDislikes[videoId];
-        localStorage.setItem(`dislikes_${user.uid}`, JSON.stringify(storedDislikes));
         setIsDisliked(false);
         setVideo(prev => prev ? { ...prev, dislikes: (prev.dislikes || 1) - 1 } : null);
       } else {
-        // Remove local like if it exists
+        // Remove like if it exists
         if (isLiked) {
           batch.update(doc(db, 'videos', videoId), {
             likes: increment(-1)
           });
-          delete storedLikes[videoId];
-          localStorage.setItem(`likes_${user.uid}`, JSON.stringify(storedLikes));
+          batch.delete(likeRef);
           setIsLiked(false);
           setVideo(prev => prev ? { ...prev, likes: (prev.likes || 1) - 1 } : null);
         }
@@ -302,10 +330,13 @@ export default function Watch() {
         batch.update(doc(db, 'videos', videoId), {
           dislikes: increment(1)
         });
+        batch.set(dislikeRef, {
+          userId: user.uid,
+          videoId,
+          createdAt: serverTimestamp()
+        });
         await batch.commit();
 
-        storedDislikes[videoId] = true;
-        localStorage.setItem(`dislikes_${user.uid}`, JSON.stringify(storedDislikes));
         setIsDisliked(true);
         setVideo(prev => prev ? { ...prev, dislikes: (prev.dislikes || 0) + 1 } : null);
       }

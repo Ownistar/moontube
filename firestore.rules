@@ -116,6 +116,22 @@ service cloud.firestore {
       allow read, create, delete: if isSignedIn();
     }
 
+    match /userLikes/{likeId} {
+      allow read: if isSignedIn();
+      allow create, delete: if isSignedIn() && (request.auth.uid == request.resource.data.userId || request.auth.uid == resource.data.userId);
+    }
+
+    match /userDislikes/{dislikeId} {
+      allow read: if isSignedIn();
+      allow create, delete: if isSignedIn() && (request.auth.uid == request.resource.data.userId || request.auth.uid == resource.data.userId);
+    }
+
+    match /userHistory/{historyId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
     // --- Transaction Validation ---
     function isValidTransaction(data) {
       return data.keys().hasAll(['userId', 'amount', 'status', 'paypalEmail', 'createdAt']) &&
