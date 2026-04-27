@@ -166,9 +166,13 @@ export default function Watch() {
 
     const fetchRelated = async () => {
       try {
-        const q = query(collection(db, 'videos'), limit(10));
+        // Fetch more to ensure we have enough non-shorts even after filtering
+        const q = query(collection(db, 'videos'), limit(40));
         const snapshot = await getDocs(q);
-        setRelatedVideos(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Video[]);
+        const allVideos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Video[];
+        // Filter out shorts and the current video
+        const filtered = allVideos.filter(v => !v.isShort && v.id !== videoId);
+        setRelatedVideos(filtered.slice(0, 10));
       } catch (err) {
         console.log(err);
       }
@@ -569,7 +573,7 @@ export default function Watch() {
         </div>
         
         <div className="space-y-4">
-          {relatedVideos.filter(v => v.id !== videoId).map(v => (
+          {relatedVideos.map(v => (
             <VideoCard key={v.id} video={v} />
           ))}
         </div>
