@@ -91,7 +91,7 @@ export default function MPPDashboard() {
           className="rounded-3xl border border-white/10 bg-white/5 p-8"
         >
           <p className="text-xs font-bold uppercase tracking-widest text-white/40">Lunar Balance</p>
-          <h2 className="mt-2 text-6xl font-bold tracking-tighter text-white">
+          <h2 className="mt-2 text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter text-white">
             {formatCurrency(profile?.earningsBalance || 0)}
           </h2>
           <p className="mt-4 text-sm text-white/40">

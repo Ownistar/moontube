@@ -5,7 +5,7 @@ import { auth, db } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
 import { Video, CATEGORIES } from '../types';
 import VideoCard from '../components/video/VideoCard';
-import { User, Film, BarChart3, Settings, Edit2, Trash2, X, Check, Save, TrendingUp, Users, PlayCircle, AlertTriangle, Zap } from 'lucide-react';
+import { User, Film, BarChart3, Settings, Edit2, Trash2, X, Check, Save, TrendingUp, Users, PlayCircle, AlertTriangle, Zap, DollarSign } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn, formatDate } from '../lib/utils';
 import { Link } from 'react-router-dom';
@@ -15,7 +15,7 @@ export default function Profile() {
   const { user, profile } = useAuth();
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'videos' | 'analytics'>('videos');
+  const [activeTab, setActiveTab] = useState<'videos' | 'analytics' | 'earnings'>('videos');
   
   // Edit Profile States
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -342,6 +342,17 @@ export default function Profile() {
         >
           <BarChart3 className="h-4 w-4" /> Analytics
         </button>
+        {profile?.mppJoinedAt && (
+          <button 
+            onClick={() => setActiveTab('earnings')}
+            className={cn(
+              "flex items-center gap-2 px-8 py-4 text-sm font-black uppercase tracking-widest transition-all",
+              activeTab === 'earnings' ? "border-b-2 border-purple-500 text-purple-500" : "text-neutral-500 hover:text-white"
+            )}
+          >
+            <DollarSign className="h-4 w-4" /> Earnings
+          </button>
+        )}
       </div>
 
       {activeTab === 'videos' ? (
@@ -383,7 +394,7 @@ export default function Profile() {
             </div>
           </div>
         )
-      ) : (
+      ) : activeTab === 'analytics' ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
            {/* Analytics Cards */}
            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-8 rounded-3xl border border-neutral-800 bg-neutral-900/50">
@@ -409,6 +420,32 @@ export default function Profile() {
               <h3 className="text-xl font-black uppercase tracking-tighter mb-2">Advanced Analytics Module Pending</h3>
               <p className="text-sm text-neutral-500 max-w-md">Deep engagement metrics and planetary heatmaps are currently in calibration. Check back after your next 10,000 views.</p>
            </div>
+        </div>
+      ) : (
+        <div className="rounded-3xl border border-neutral-800 bg-neutral-900/50 p-12 text-center">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-purple-600/10 text-purple-500">
+            <DollarSign className="h-10 w-10" />
+          </div>
+          <h2 className="text-3xl font-black uppercase tracking-tighter mb-4">Lunar Revenue Stream</h2>
+          <p className="text-neutral-500 mb-8 max-w-lg mx-auto font-medium">Your planetary impact is generating economic value. Monitor your balances and request payouts through the central command station.</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto mb-8">
+            <div className="p-6 rounded-2xl bg-black/40 border border-neutral-800">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 text-left mb-1">Current Balance</p>
+              <p className="text-2xl sm:text-3xl font-black text-white text-left">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(profile?.earningsBalance || 0)}</p>
+            </div>
+            <div className="p-6 rounded-2xl bg-black/40 border border-neutral-800">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 text-left mb-1">Lifetime RPM</p>
+              <p className="text-3xl font-black text-white text-left">$0.50</p>
+            </div>
+          </div>
+
+          <Link 
+            to="/mpp" 
+            className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-10 py-4 font-black uppercase tracking-widest text-white shadow-xl mpp-glow hover:bg-purple-500 transition-all active:scale-95"
+          >
+            Open Earnings Command <TrendingUp className="h-5 w-5" />
+          </Link>
         </div>
       )}
     </div>
