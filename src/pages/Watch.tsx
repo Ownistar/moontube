@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { Video } from '../types';
 import { trackInterest, getRecommendedVideos } from '../lib/recommendations';
 import { formatViews, formatCurrency, cn, formatDate } from '../lib/utils';
-import { ThumbsUp, ThumbsDown, Bookmark, MoreHorizontal, Moon, Check, Clock, Play } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Bookmark, MoreHorizontal, Moon, Check, Clock, Play, Share2, Copy } from 'lucide-react';
 import VideoCard from '../components/video/VideoCard';
 import CommentSection from '../components/video/CommentSection';
 import AdUnit from '../components/ads/AdUnit';
@@ -55,6 +55,7 @@ export default function Watch() {
   const [isSaved, setIsSaved] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [showShareToast, setShowShareToast] = useState(false);
   
   const menuRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YouTubePlayer | null>(null);
@@ -436,6 +437,30 @@ export default function Watch() {
     }
   };
 
+  const handleShare = async () => {
+    const shareData = {
+      title: video?.title || 'MoonTube Video',
+      text: video?.description || 'Check out this signal on MoonTube!',
+      url: window.location.href
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.log('Share failed:', err);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        setShowShareToast(true);
+        setTimeout(() => setShowShareToast(false), 2000);
+      } catch (err) {
+        console.error('Copy failed:', err);
+      }
+    }
+  };
+
   const [sessionUnlocked, setSessionUnlocked] = useState(() => {
     return sessionStorage.getItem('moon_unlocked') === 'true';
   });
@@ -529,7 +554,19 @@ export default function Watch() {
         </div>
 
         {/* Video Info */}
-        <div className="mt-6">
+        <div className="mt-6 relative">
+          <AnimatePresence>
+            {showShareToast && (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="absolute -top-12 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-purple-600 px-4 py-2 rounded-full text-xs font-black text-white shadow-2xl mpp-glow"
+              >
+                <Copy className="h-3 w-3" /> Signal Link Copied to Clipboard
+              </motion.div>
+            )}
+          </AnimatePresence>
           <h1 className="text-xl font-black uppercase tracking-tighter md:text-3xl">{video.title}</h1>
           
           <div className="mt-6 flex flex-wrap items-center justify-between gap-6">
@@ -603,6 +640,15 @@ export default function Watch() {
                   )}
                 </motion.button>
               </div>
+
+              <motion.button 
+                whileTap={{ scale: 0.9 }}
+                onClick={handleShare}
+                className="flex items-center gap-2 rounded-full border border-neutral-800 bg-neutral-900/50 px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-white/60 transition-all hover:bg-neutral-800 hover:text-white shadow-xl"
+              >
+                <Share2 className="h-4 w-4" /> Share
+              </motion.button>
+
               <div className="relative" ref={menuRef}>
                 <button 
                   onClick={() => setShowMenu(!showMenu)}
