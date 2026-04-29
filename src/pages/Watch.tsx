@@ -5,7 +5,7 @@ import { db } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
 import { Video } from '../types';
 import { trackInterest, getRecommendedVideos } from '../lib/recommendations';
-import { formatViews, formatCurrency, cn } from '../lib/utils';
+import { formatViews, formatCurrency, cn, formatDate } from '../lib/utils';
 import { ThumbsUp, ThumbsDown, Bookmark, MoreHorizontal, Moon, Check, Clock, Play } from 'lucide-react';
 import VideoCard from '../components/video/VideoCard';
 import CommentSection from '../components/video/CommentSection';
@@ -644,7 +644,7 @@ export default function Watch() {
             <div className="flex items-center gap-4 font-black uppercase tracking-widest text-[10px] text-neutral-500 mb-4">
               <span className="text-purple-500 font-mono text-xs">{formatViews(video.views)} Views</span>
               <span>•</span>
-              <span>Decoded Dec 2023</span>
+              <span>Decoded {formatDate(video.createdAt)}</span>
             </div>
             <p className="whitespace-pre-wrap text-white/80 leading-relaxed font-medium tracking-tight">
               {video.description || "No signal metadata provided for this planetary transmission."}

@@ -24,3 +24,24 @@ export function getYoutubeId(url: string) {
   const match = url.match(regExp);
   return (match && match[2].length === 11) ? match[2] : null;
 }
+
+export function formatDate(date: any) {
+  if (!date) return 'Unknown';
+  
+  let d: Date;
+  if (typeof date === 'string') {
+    d = new Date(date);
+  } else if (date?.toDate) {
+    // Firestore timestamp
+    d = date.toDate();
+  } else if (date?.seconds) {
+     d = new Date(date.seconds * 1000);
+  } else {
+    d = new Date(date);
+  }
+
+  return d.toLocaleDateString('en-US', {
+    month: 'short',
+    year: 'numeric'
+  }).toUpperCase();
+}

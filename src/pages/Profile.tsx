@@ -7,7 +7,7 @@ import { Video, CATEGORIES } from '../types';
 import VideoCard from '../components/video/VideoCard';
 import { User, Film, BarChart3, Settings, Edit2, Trash2, X, Check, Save, TrendingUp, Users, PlayCircle, AlertTriangle, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { cn } from '../lib/utils';
+import { cn, formatDate } from '../lib/utils';
 import { Link } from 'react-router-dom';
 import { handleFirestoreError, OperationType } from '../lib/firebase';
 
@@ -287,7 +287,7 @@ export default function Profile() {
               <h1 className="text-4xl font-black tracking-tighter uppercase">{profile?.displayName || 'User'}</h1>
               {profile?.mppJoinedAt && <div className="bg-purple-600 text-white text-[10px] font-black px-2 py-0.5 rounded shadow-lg mpp-glow">MOON PARTNER</div>}
             </div>
-            <p className="mt-2 text-neutral-500 font-medium tracking-tight">System Node Established: {profile?.mppJoinedAt ? new Date(profile.mppJoinedAt).toLocaleDateString() : 'Active'}</p>
+            <p className="mt-2 text-neutral-500 font-medium tracking-tight">System Node Established: {profile?.mppJoinedAt ? formatDate(profile.mppJoinedAt) : 'Active'}</p>
             
             <div className="mt-6 flex flex-wrap justify-center gap-4 md:justify-start">
               <div className="rounded-2xl border border-neutral-800 bg-black/40 px-6 py-3 text-center min-w-[100px]">
