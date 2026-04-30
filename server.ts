@@ -11,6 +11,28 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  // API routes go here
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "ok" });
+  });
+
+  // Explicitly serve sitemap and robots.txt from public if they exist
+  app.get("/sitemap.xml", (req, res, next) => {
+    const sitemapPath = path.join(process.cwd(), "public", "sitemap.xml");
+    if (fs.existsSync(sitemapPath)) {
+      return res.sendFile(sitemapPath);
+    }
+    next();
+  });
+
+  app.get("/robots.txt", (req, res, next) => {
+    const robotsPath = path.join(process.cwd(), "public", "robots.txt");
+    if (fs.existsSync(robotsPath)) {
+      return res.sendFile(robotsPath);
+    }
+    next();
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
