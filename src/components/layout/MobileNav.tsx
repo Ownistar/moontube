@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Compass, User, History, Video, DollarSign } from 'lucide-react';
+import { Home, Compass, User, History, Video, DollarSign, HelpCircle } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useAuth } from '../../context/AuthContext';
 
@@ -12,6 +12,7 @@ export default function MobileNav() {
     <div className="fixed bottom-0 left-0 right-0 z-50 flex h-16 border-t border-neutral-800 bg-black/95 px-2 pb-safe backdrop-blur-md md:hidden">
       <div className="flex w-full items-center justify-around">
         <MobileNavLink to="/" icon={Home} label="Home" active={location.pathname === '/'} />
+        <MobileNavLink to="/how-it-works" icon={HelpCircle} label="Guide" active={location.pathname === '/how-it-works'} />
         <MobileNavLink to="/explore" icon={Compass} label="Explore" active={location.pathname === '/explore'} />
         <MobileNavLink to="/upload" icon={Video} label="Import" active={location.pathname === '/upload'} />
         <MobileNavLink to="/mpp" icon={DollarSign} label="Earnings" active={location.pathname === '/mpp'} />

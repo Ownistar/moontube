@@ -13,6 +13,7 @@ import History from './pages/History';
 import LikedVideos from './pages/LikedVideos';
 import Admin from './pages/Admin';
 import Channel from './pages/Channel';
+import HowItWorks from './pages/HowItWorks';
 import Navbar from './components/layout/Navbar';
 import Sidebar from './components/layout/Sidebar';
 import Login from './pages/Login';
@@ -58,6 +59,7 @@ function AppContent() {
             {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/explore" element={<Explore />} />
+            <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/watch/:videoId" element={<Watch />} />
             
             {/* Protected Routes - Redirect to Home if not logged in (Nav and Modals handle Login) */}
