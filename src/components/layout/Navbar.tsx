@@ -101,6 +101,9 @@ export default function Navbar() {
       </div>
 
       <div className="flex items-center gap-3 md:gap-5">
+        <div className="hidden lg:flex items-center gap-2 mr-1">
+          <span className="text-[10px] font-black uppercase tracking-widest text-[#8B5CF6] animate-pulse">Start earning</span>
+        </div>
         <Link to="/upload" title="Upload" className="bg-[#8B5CF6] px-5 py-2 rounded-full text-xs font-bold text-white mpp-glow hidden md:flex items-center gap-2 hover:bg-[#7C3AED] transition-colors">
           <Video className="h-4 w-4" /> IMPORT
         </Link>

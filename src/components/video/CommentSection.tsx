@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useAuth } from '../../context/AuthContext';
@@ -131,7 +132,7 @@ export default function CommentSection({ videoId }: CommentSectionProps) {
               exit={{ opacity: 0, scale: 0.95 }}
               className="flex gap-4 group"
             >
-              <div className="h-10 w-10 rounded-full overflow-hidden flex-shrink-0 bg-neutral-800">
+              <Link to={`/channel/${comment.userId}`} className="h-10 w-10 rounded-full overflow-hidden flex-shrink-0 bg-neutral-800 hover:opacity-80 transition-opacity">
                 {comment.userPhoto ? (
                   <img src={comment.userPhoto} alt={comment.userName} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
                 ) : (
@@ -139,10 +140,12 @@ export default function CommentSection({ videoId }: CommentSectionProps) {
                     <User className="h-5 w-5 text-neutral-500" />
                   </div>
                 )}
-              </div>
+              </Link>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs font-black uppercase tracking-tight">{comment.userName}</span>
+                  <Link to={`/channel/${comment.userId}`} className="text-xs font-black uppercase tracking-tight hover:text-purple-400 transition-colors">
+                    {comment.userName}
+                  </Link>
                   <span className="text-[10px] text-neutral-500 font-bold uppercase">
                     {comment.createdAt ? formatDistanceToNow(comment.createdAt.toDate()) + ' ago' : 'Just now'}
                   </span>

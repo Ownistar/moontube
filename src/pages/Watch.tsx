@@ -43,6 +43,7 @@ export default function Watch() {
   const { user } = useAuth();
   const [video, setVideo] = useState<Video | null>(null);
   const [relatedVideos, setRelatedVideos] = useState<Video[]>([]);
+  const [channelInfo, setChannelInfo] = useState<{ subscriberCount: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subLoading, setSubLoading] = useState(false);
@@ -144,6 +145,18 @@ export default function Watch() {
         if (videoDoc.exists()) {
           const data = videoDoc.data() as Video;
           setVideo({ id: videoDoc.id, ...data });
+
+          // Fetch owner's subscriber count
+          if (data.ownerId) {
+            try {
+              const ownerSnap = await getDoc(doc(db, 'users', data.ownerId));
+              if (ownerSnap.exists()) {
+                setChannelInfo({ subscriberCount: ownerSnap.data().subscriberCount || 0 });
+              }
+            } catch (err) {
+              console.error('Error fetching owner info:', err);
+            }
+          }
 
           // Check subscription status
           if (user && data.ownerId) {
@@ -293,6 +306,7 @@ export default function Watch() {
         });
         await batch.commit();
         setIsSubscribed(false);
+        setChannelInfo(prev => prev ? { subscriberCount: Math.max(0, prev.subscriberCount - 1) } : null);
       } else {
         const batch = writeBatch(db);
         batch.set(subRef, {
@@ -305,6 +319,7 @@ export default function Watch() {
         });
         await batch.commit();
         setIsSubscribed(true);
+        setChannelInfo(prev => prev ? { subscriberCount: prev.subscriberCount + 1 } : null);
       }
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `subscriptions/${video.ownerId}_${user.uid}`);
@@ -580,7 +595,12 @@ export default function Watch() {
                   )}
                 </div>
                 <div>
-                  <p className="font-black uppercase tracking-tight text-lg group-hover:text-purple-400 transition-colors">{video.ownerName || 'Unknown Astronaut'}</p>
+                  <div className="flex items-baseline gap-2">
+                    <p className="font-black uppercase tracking-tight text-lg group-hover:text-purple-400 transition-colors">{video.ownerName || 'Unknown Astronaut'}</p>
+                    {channelInfo !== null && (
+                      <span className="text-[10px] font-bold text-neutral-500 mb-0.5">{formatViews(channelInfo.subscriberCount)} followers</span>
+                    )}
+                  </div>
                   <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest">Moon Partner • Instant Access</p>
                 </div>
               </Link>

@@ -83,7 +83,7 @@ export default function Upload() {
       >
         <div>
           <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-white/40">
-            YouTube URL
+            YouTube Video URL
           </label>
           <div className="relative">
             <LinkIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-white/20" />
