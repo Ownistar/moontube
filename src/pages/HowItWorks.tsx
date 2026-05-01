@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { HelpCircle, ChevronRight, CheckCircle2, Zap, DollarSign, Globe } from 'lucide-react';
+import { HelpCircle, ChevronRight, CheckCircle2, Zap, DollarSign, Globe, Shield } from 'lucide-react';
 
 export default function HowItWorks() {
   const steps = [
@@ -79,6 +79,25 @@ export default function HowItWorks() {
           </motion.div>
         ))}
       </div>
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="mb-20 bg-neutral-900/30 border border-neutral-800/50 rounded-3xl p-8 md:p-12"
+      >
+        <div className="flex flex-col md:flex-row gap-8 items-start">
+          <div className="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center shrink-0">
+            <Shield className="h-7 w-7 text-purple-500" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold mb-4">Transparent Business Model</h2>
+            <p className="text-neutral-400 leading-relaxed text-lg">
+              At MoonTube, we believe small creators deserve a fair share. We aggregate the views from our entire creator community to negotiate higher-tier advertising rates with premium networks. By bypassing the traditional YouTube Partner hurdles, we distribute these earnings back to you from view number one. We win when you win.
+            </p>
+          </div>
+        </div>
+      </motion.div>
 
       <div className="bg-gradient-to-b from-neutral-900 to-black border border-neutral-800 rounded-3xl p-8 md:p-12 overflow-hidden relative">
         <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 blur-[120px] rounded-full" />
