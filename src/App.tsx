@@ -18,7 +18,6 @@ import Navbar from './components/layout/Navbar';
 import Sidebar from './components/layout/Sidebar';
 import Login from './pages/Login';
 import MobileNav from './components/layout/MobileNav';
-import PopUnder from './components/ads/PopUnder';
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -50,7 +49,6 @@ function AppContent() {
 
   return (
     <div className="flex h-screen flex-col bg-[#050505] text-white">
-      <PopUnder />
       <Navbar />
       <div className="flex flex-1 overflow-hidden pb-16 md:pb-0">
         <Sidebar />
