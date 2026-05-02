@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 
 const POPUNDER_KEY = 'mpp_pu_last_shown';
 const CLICK_COUNT_KEY = 'mpp_pu_clicks';
+const INJECTED_THIS_SESSION = 'mpp_pu_injected';
 const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
 const TRIGGER_CLICK_COUNT = 6;
 
@@ -12,44 +13,62 @@ export default function PopUnder() {
     const handleInteraction = () => {
       const currentTime = Date.now();
       
-      // Basic debounce
+      // Basic debounce to prevent double-counting touch+click as two interactions
       if (currentTime - lastEventTime < 300) return;
       lastEventTime = currentTime;
 
-      // Check 24-hour frequency cap
+      // Check 24-hour frequency cap first
       const lastShown = localStorage.getItem(POPUNDER_KEY);
       if (lastShown && (currentTime - parseInt(lastShown)) < TWENTY_FOUR_HOURS) {
         return;
       }
 
-      // Increment click count (using localStorage for "unique user" persistence)
+      // Check if we already injected it in this session to prevent multiple firings
+      if (sessionStorage.getItem(INJECTED_THIS_SESSION)) {
+        return;
+      }
+
+      // Increment click count (persisted for unique user logic)
       const currentClicks = parseInt(localStorage.getItem(CLICK_COUNT_KEY) || '0');
       const newClicks = currentClicks + 1;
       localStorage.setItem(CLICK_COUNT_KEY, newClicks.toString());
 
-      // Trigger sequence
-      // Load script on the 5th click so it's ready for the 6th interaction
-      if (newClicks === TRIGGER_CLICK_COUNT - 1) {
-        const script = document.createElement('script');
-        script.src = 'https://accedelid.com/f3/5f/d8/f35fd8f3c65fc113ce4deba181806518.js';
-        script.async = true;
-        document.head.appendChild(script);
-      } 
-      
-      // On the 6th click, we consider it "fired" for the 24h frequency cap
-      if (newClicks === TRIGGER_CLICK_COUNT) {
+      // Trigger sequence: Load and arm on the 6th click
+      // The script will likely fire the actual popunder on the 7th click.
+      if (newClicks >= TRIGGER_CLICK_COUNT) {
+        // Mark as shown for the next 24 hours immediately
         localStorage.setItem(POPUNDER_KEY, currentTime.toString());
-        // Reset clicks for the next 24 hour period
+        // Reset clicks for the next cycle
         localStorage.setItem(CLICK_COUNT_KEY, '0');
+        // Flag this session as "armed and fired"
+        sessionStorage.setItem(INJECTED_THIS_SESSION, 'true');
+
+        // Check if script already exists to avoid redundant tags
+        if (!document.querySelector('script[src*="f35fd8f3c65fc113ce4deba181806518"]')) {
+          const script = document.createElement('script');
+          script.src = 'https://accedelid.com/f3/5f/d8/f35fd8f3c65fc113ce4deba181806518.js';
+          script.async = true;
+          document.head.appendChild(script);
+        }
         
-        // Remove listener for this cycle
+        // Remove our own listeners immediately to stop counting/processing
         document.removeEventListener('click', handleInteraction);
         document.removeEventListener('touchstart', handleInteraction);
       }
     };
 
-    document.addEventListener('click', handleInteraction);
-    document.addEventListener('touchstart', handleInteraction);
+    // Safety check: if already shown in 24h or already done this session, don't even attach listeners
+    const lastShown = localStorage.getItem(POPUNDER_KEY);
+    const currentTime = Date.now();
+    if (
+      (lastShown && (currentTime - parseInt(lastShown)) < TWENTY_FOUR_HOURS) ||
+      sessionStorage.getItem(INJECTED_THIS_SESSION)
+    ) {
+      return;
+    }
+
+    document.addEventListener('click', handleInteraction, { passive: true });
+    document.addEventListener('touchstart', handleInteraction, { passive: true });
 
     return () => {
       document.removeEventListener('click', handleInteraction);
