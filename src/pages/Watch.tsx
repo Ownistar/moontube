@@ -130,6 +130,12 @@ export default function Watch() {
   };
 
   useEffect(() => {
+    // Scroll the main layout container back to top
+    const mainElement = document.querySelector('main');
+    if (mainElement) {
+      mainElement.scrollTo(0, 0);
+    }
+    window.scrollTo(0, 0);
     setViewChecked(false);
     setPlayerReady(false);
     if (watchTimerRef.current) {
