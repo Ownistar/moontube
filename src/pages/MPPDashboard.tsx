@@ -73,17 +73,17 @@ export default function MPPDashboard() {
 
   return (
     <div className="max-w-4xl mx-auto px-4">
-      <header className="mb-12 flex items-center justify-between">
+      <header className="mb-12 flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-black italic tracking-tighter uppercase text-purple-500">Creator Moon Station</h1>
-          <p className="text-white/40">Real-time earnings tracking with fixed $0.50 RPM</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black italic tracking-tighter uppercase text-purple-500">Creator Moon Station</h1>
+          <p className="text-sm sm:text-base text-white/40">Real-time earnings tracking with fixed $0.50 RPM</p>
         </div>
-        <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#8B5CF6] text-white shadow-[0_0_40px_rgba(139,92,246,0.3)]">
-          <DollarSign className="h-8 w-8" />
+        <div className="flex h-12 w-12 sm:h-16 sm:w-16 flex-shrink-0 items-center justify-center rounded-2xl sm:rounded-3xl bg-[#8B5CF6] text-white shadow-[0_0_40px_rgba(139,92,246,0.3)]">
+          <DollarSign className="h-6 w-6 sm:h-8 sm:w-8" />
         </div>
       </header>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Earnings Card */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}

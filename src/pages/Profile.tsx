@@ -268,62 +268,71 @@ export default function Profile() {
       </AnimatePresence>
 
       {/* Header */}
-      <div className="relative mb-12 overflow-hidden rounded-3xl bg-neutral-900 border border-neutral-800 p-8 md:p-12 shadow-2xl">
+      <div className="relative mb-12 overflow-hidden rounded-3xl bg-neutral-900 border border-neutral-800 p-4 sm:p-8 md:p-12 shadow-2xl">
         <div className="absolute right-0 top-0 h-64 w-64 translate-x-1/2 translate-y-[-50%] rounded-full bg-purple-600/10 blur-[100px]" />
         
-        <div className="relative flex flex-col items-center gap-8 md:flex-row">
-          <div className="h-32 w-32 shrink-0 overflow-hidden rounded-full ring-4 ring-neutral-800 shadow-2xl">
+        <div className="relative flex flex-col items-center gap-6 lg:flex-row lg:items-start lg:gap-8 text-center lg:text-left">
+          <div className="h-24 w-24 sm:h-32 sm:w-32 shrink-0 overflow-hidden rounded-full ring-2 sm:ring-4 ring-neutral-800 shadow-2xl">
             {profile?.photoURL ? (
               <img src={profile.photoURL} alt={profile.displayName} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-neutral-800 text-4xl text-purple-500">
-                <User className="h-12 w-12" />
+              <div className="flex h-full w-full items-center justify-center bg-neutral-800 text-2xl sm:text-4xl text-purple-500">
+                <User className="h-8 w-8 sm:h-12 sm:w-12" />
               </div>
             )}
           </div>
           
-          <div className="flex-1 text-center md:text-left">
-            <div className="flex items-center justify-center gap-3 md:justify-start">
-              <h1 className="text-4xl font-black tracking-tighter uppercase">{profile?.displayName || 'User'}</h1>
-              {profile?.mppJoinedAt && <div className="bg-purple-600 text-white text-[10px] font-black px-2 py-0.5 rounded shadow-lg mpp-glow">MOON PARTNER</div>}
+          <div className="flex-1 min-w-0 w-full">
+            <div className="flex flex-col gap-0.5 sm:gap-1">
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2">
+                <h1 className="text-xl sm:text-3xl lg:text-4xl font-black tracking-tighter uppercase truncate leading-tight max-w-full">{profile?.displayName || 'User'}</h1>
+                {profile?.mppJoinedAt && <div className="bg-purple-600 text-white text-[8px] sm:text-[10px] font-black px-1.5 py-0.5 rounded shadow-lg mpp-glow whitespace-nowrap shrink-0">MOON PARTNER</div>}
+              </div>
+              <p className="text-neutral-500 font-medium tracking-tight text-[10px] sm:text-sm">System Node Established: {profile?.mppJoinedAt ? formatDate(profile.mppJoinedAt) : 'Active'}</p>
             </div>
-            <p className="mt-2 text-neutral-500 font-medium tracking-tight">System Node Established: {profile?.mppJoinedAt ? formatDate(profile.mppJoinedAt) : 'Active'}</p>
             
-            <div className="mt-6 flex flex-wrap justify-center gap-4 md:justify-start">
-              <div className="rounded-2xl border border-neutral-800 bg-black/40 px-6 py-3 text-center min-w-[100px]">
-                <p className="text-xl font-black text-purple-500">{videos.length}</p>
-                <p className="text-[10px] uppercase tracking-widest text-neutral-500 font-bold">Clips</p>
+            <div className="mt-6 flex flex-col gap-6">
+              {/* Stats Row - Strictly horizontal */}
+              <div className="flex flex-row gap-2 sm:gap-4 max-w-md mx-auto lg:mx-0">
+                <div className="flex-1 rounded-xl border border-neutral-800 bg-black/40 p-2 sm:px-6 sm:py-3 text-center min-w-0">
+                  <p className="text-xs sm:text-xl font-black text-purple-500 leading-none truncate">{videos.length}</p>
+                  <p className="text-[7px] sm:text-[10px] uppercase tracking-widest text-neutral-500 font-bold mt-1">Clips</p>
+                </div>
+                <div className="flex-1 rounded-xl border border-neutral-800 bg-black/40 p-2 sm:px-6 sm:py-3 text-center min-w-0">
+                  <p className="text-xs sm:text-xl font-black text-purple-500 font-mono leading-none truncate">{profile?.totalViews || 0}</p>
+                  <p className="text-[7px] sm:text-[10px] uppercase tracking-widest text-neutral-500 font-bold mt-1">Impact</p>
+                </div>
+                <div className="flex-1 rounded-xl border border-neutral-800 bg-black/40 p-2 sm:px-6 sm:py-3 text-center min-w-0">
+                  <p className="text-xs sm:text-xl font-black text-purple-500 font-mono leading-none truncate">{profile?.subscriberCount || 0}</p>
+                  <p className="text-[7px] sm:text-[10px] uppercase tracking-widest text-neutral-500 font-bold mt-1">Followers</p>
+                </div>
               </div>
-              <div className="rounded-2xl border border-neutral-800 bg-black/40 px-6 py-3 text-center min-w-[100px]">
-                <p className="text-xl font-black text-purple-500 font-mono">{profile?.totalViews || 0}</p>
-                <p className="text-[10px] uppercase tracking-widest text-neutral-500 font-bold">Impact</p>
+
+              {/* Actions Row - Strictly horizontal */}
+              <div className="flex flex-row items-center justify-center lg:justify-start gap-2 sm:gap-3">
+                <button 
+                  onClick={() => {
+                    setEditName(profile?.displayName || '');
+                    setEditPhoto(profile?.photoURL || '');
+                    setIsEditingProfile(true);
+                  }}
+                  className="flex-1 lg:flex-none flex items-center justify-center gap-1.5 sm:gap-2 rounded-xl border border-neutral-800 bg-white/5 px-2 sm:px-6 py-2 sm:py-3 text-[9px] sm:text-sm font-bold hover:bg-neutral-800 transition-all transform active:scale-95 whitespace-nowrap"
+                >
+                  <Settings className="h-3 w-3 sm:h-4 sm:w-4" /> <span className="hidden xs:inline">Configure</span><span className="xs:hidden">Edit</span>
+                </button>
+                <Link 
+                  to={`/channel/${user.uid}`}
+                  className="flex-1 lg:flex-none flex items-center justify-center gap-1.5 sm:gap-2 rounded-xl border border-purple-500/20 bg-purple-500/10 px-2 sm:px-6 py-2 sm:py-3 text-[9px] sm:text-sm font-bold text-purple-400 hover:bg-purple-500 hover:text-white transition-all transform active:scale-95 shadow-lg whitespace-nowrap"
+                >
+                  <User className="h-3 w-3 sm:h-4 sm:w-4" /> <span className="hidden xs:inline">View Channel</span><span className="xs:hidden">Channel</span>
+                </Link>
+                <button 
+                  onClick={() => signOut()}
+                  className="flex items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 px-3 sm:px-4 py-2 sm:py-3 text-red-400 hover:bg-red-500 hover:text-white transition-all transform active:scale-95"
+                >
+                  <LogOut className="h-3 w-3 sm:h-4 sm:w-4" />
+                </button>
               </div>
-              <div className="rounded-2xl border border-neutral-800 bg-black/40 px-6 py-3 text-center min-w-[100px]">
-                <p className="text-xl font-black text-purple-500 font-mono">{profile?.subscriberCount || 0}</p>
-                <p className="text-[10px] uppercase tracking-widest text-neutral-500 font-bold">Followers</p>
-              </div>
-              <button 
-                onClick={() => {
-                  setEditName(profile?.displayName || '');
-                  setEditPhoto(profile?.photoURL || '');
-                  setIsEditingProfile(true);
-                }}
-                className="flex items-center gap-2 rounded-2xl border border-neutral-800 bg-white/5 px-6 py-3 text-sm font-bold hover:bg-neutral-800 transition-all transform active:scale-95"
-              >
-                <Settings className="h-4 w-4" /> Configure
-              </button>
-              <Link 
-                to={`/channel/${user.uid}`}
-                className="flex items-center gap-2 rounded-2xl border border-purple-500/20 bg-purple-500/10 px-6 py-3 text-sm font-bold text-purple-400 hover:bg-purple-500 hover:text-white transition-all transform active:scale-95 shadow-lg"
-              >
-                <User className="h-4 w-4" /> View Channel
-              </Link>
-              <button 
-                onClick={() => signOut()}
-                className="flex items-center gap-2 rounded-2xl border border-red-500/20 bg-red-500/10 px-6 py-3 text-sm font-bold text-red-400 hover:bg-red-500 hover:text-white transition-all transform active:scale-95 shadow-lg"
-              >
-                <LogOut className="h-4 w-4" /> Sign Out
-              </button>
             </div>
           </div>
         </div>
@@ -390,27 +399,27 @@ export default function Profile() {
           </div>
         )
       ) : activeTab === 'analytics' ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
            {/* Analytics Cards */}
-           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-8 rounded-3xl border border-neutral-800 bg-neutral-900/50">
-              <div className="flex items-center gap-3 text-purple-500 mb-4">
-                 <TrendingUp className="h-5 w-5" />
-                 <span className="text-xs font-black uppercase tracking-widest">Growth Velocity</span>
+           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-5 sm:p-8 rounded-3xl border border-neutral-800 bg-neutral-900/50">
+              <div className="flex items-center gap-2 sm:gap-3 text-purple-500 mb-4">
+                 <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
+                 <span className="text-[10px] sm:text-xs font-black uppercase tracking-widest whitespace-nowrap">Growth Velocity</span>
               </div>
-              <p className="text-4xl font-black">+12.4%</p>
+              <p className="text-xl sm:text-3xl lg:text-4xl font-black">+12.4%</p>
               <p className="text-[10px] text-neutral-500 mt-2">Increased reach vs last lunar cycle</p>
            </motion.div>
-           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="p-8 rounded-3xl border border-neutral-800 bg-neutral-900/50">
-              <div className="flex items-center gap-3 text-purple-500 mb-4">
-                 <Users className="h-5 w-5" />
-                 <span className="text-xs font-black uppercase tracking-widest">Active Audience</span>
+           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="p-5 sm:p-8 rounded-3xl border border-neutral-800 bg-neutral-900/50">
+              <div className="flex items-center gap-2 sm:gap-3 text-purple-500 mb-4">
+                 <Users className="h-4 w-4 sm:h-5 sm:w-5" />
+                 <span className="text-[10px] sm:text-xs font-black uppercase tracking-widest whitespace-nowrap">Active Audience</span>
               </div>
-              <p className="text-4xl font-black">{profile?.totalViews || 0}</p>
+              <p className="text-xl sm:text-3xl lg:text-4xl font-black">{profile?.totalViews || 0}</p>
               <p className="text-[10px] text-neutral-500 mt-2">Total unique planetary views</p>
            </motion.div>
 
 
-           <div className="md:col-span-3 p-12 rounded-3xl border border-neutral-800 bg-neutral-900/30 flex flex-col items-center justify-center text-center">
+           <div className="sm:col-span-2 lg:col-span-1 p-8 sm:p-12 rounded-3xl border border-neutral-800 bg-neutral-900/30 flex flex-col items-center justify-center text-center">
               <PlayCircle className="h-12 w-12 text-purple-500 mb-4 opacity-50" />
               <h3 className="text-xl font-black uppercase tracking-tighter mb-2">Advanced Analytics Module Pending</h3>
                <p className="text-sm text-neutral-500 max-w-md">Deep engagement metrics and planetary heatmaps are currently in calibration. Check back after your next 10,000 views.</p>

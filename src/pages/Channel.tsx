@@ -101,45 +101,49 @@ export default function Channel() {
   return (
     <div className="mx-auto max-w-6xl px-2 sm:px-4 lg:px-8">
       {/* Header */}
-      <div className="relative mb-8 overflow-hidden rounded-3xl bg-neutral-900 border border-neutral-800 p-8 md:p-12 shadow-2xl">
+      <div className="relative mb-8 overflow-hidden rounded-3xl bg-neutral-900 border border-neutral-800 p-4 sm:p-8 md:p-12 shadow-2xl">
         <div className="absolute right-0 top-0 h-64 w-64 translate-x-1/2 translate-y-[-50%] rounded-full bg-purple-600/10 blur-[100px]" />
         
-        <div className="relative flex flex-col items-center gap-8 md:flex-row">
-          <div className="h-32 w-32 shrink-0 overflow-hidden rounded-full ring-4 ring-neutral-800 shadow-2xl">
+        <div className="relative flex flex-col items-center gap-6 lg:flex-row lg:items-start lg:gap-8 text-center lg:text-left">
+          <div className="h-24 w-24 sm:h-32 sm:w-32 shrink-0 overflow-hidden rounded-full ring-2 sm:ring-4 ring-neutral-800 shadow-2xl">
             {channelProfile.photoURL ? (
               <img src={channelProfile.photoURL} alt={channelProfile.displayName} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-neutral-800 text-4xl text-purple-500">
-                <User className="h-12 w-12" />
+              <div className="flex h-full w-full items-center justify-center bg-neutral-800 text-2xl sm:text-4xl text-purple-500">
+                <User className="h-10 w-10 sm:h-12 sm:w-12" />
               </div>
             )}
           </div>
           
-          <div className="flex-1 text-center md:text-left">
-            <div className="flex flex-col md:flex-row md:items-center gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center justify-center gap-3 md:justify-start">
-                  <h1 className="text-4xl font-black tracking-tighter uppercase">{channelProfile.displayName}</h1>
-                  {channelProfile.mppJoinedAt && <div className="bg-purple-600 text-white text-[10px] font-black px-2 py-0.5 rounded shadow-lg mpp-glow">MOON PARTNER</div>}
+          <div className="flex-1 min-w-0 w-full">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-col gap-0.5 sm:gap-1">
+                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2">
+                    <h1 className="text-xl sm:text-2xl lg:text-4xl font-black tracking-tighter uppercase truncate leading-tight max-w-full">{channelProfile.displayName}</h1>
+                    {channelProfile.mppJoinedAt && <div className="bg-purple-600 text-white text-[8px] sm:text-[10px] font-black px-1.5 py-0.5 rounded shadow-lg mpp-glow whitespace-nowrap shrink-0">MOON PARTNER</div>}
+                  </div>
+                  <p className="text-neutral-500 font-medium tracking-tight text-[10px] sm:text-sm">
+                    @{channelProfile.displayName.toLowerCase().replace(/\s+/g, '')} • {channelProfile.subscriberCount || 0} Followers • {formatViews(totalViews)} Views
+                  </p>
                 </div>
-                <p className="text-neutral-500 font-medium tracking-tight">
-                  @{channelProfile.displayName.toLowerCase().replace(/\s+/g, '')} • {channelProfile.subscriberCount || 0} Followers • {formatViews(totalViews)} Views
-                </p>
               </div>
 
               {currentUser && currentUser.uid !== userId && (
-                 <button 
-                   onClick={handleSubscribe}
-                   disabled={subLoading}
-                   className={cn(
-                     "rounded-full px-12 py-3.5 text-sm font-black uppercase tracking-widest transition-all shadow-xl active:scale-95",
-                     isSubscribed 
-                       ? "bg-neutral-800 text-neutral-400 hover:bg-neutral-700" 
-                       : "bg-purple-600 text-white hover:bg-purple-700 mpp-glow"
-                   )}
-                 >
-                   {subLoading ? '...' : isSubscribed ? <span className="flex items-center gap-2"><Check className="h-4 w-4" /> Following</span> : 'Follow'}
-                 </button>
+                 <div className="flex justify-center lg:justify-end shrink-0">
+                   <button 
+                     onClick={handleSubscribe}
+                     disabled={subLoading}
+                     className={cn(
+                       "rounded-full px-8 lg:px-12 py-2.5 lg:py-3.5 text-[10px] lg:text-sm font-black uppercase tracking-widest transition-all shadow-xl active:scale-95 whitespace-nowrap",
+                       isSubscribed 
+                         ? "bg-neutral-800 text-neutral-400 hover:bg-neutral-700" 
+                         : "bg-purple-600 text-white hover:bg-purple-700 mpp-glow"
+                     )}
+                   >
+                     {subLoading ? '...' : isSubscribed ? <span className="flex items-center gap-1 lg:gap-2"><Check className="h-4 w-4" /> Following</span> : 'Follow'}
+                   </button>
+                 </div>
               )}
             </div>
           </div>

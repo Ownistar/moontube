@@ -58,24 +58,24 @@ export default function HowItWorks() {
         </p>
       </motion.div>
 
-      <div className="grid md:grid-cols-3 gap-8 mb-20 relative">
-        <div className="hidden md:block absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-neutral-800 to-transparent -translate-y-1/2 z-0" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-20 relative">
+        <div className="hidden lg:block absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-neutral-800 to-transparent -translate-y-1/2 z-0" />
         {steps.map((step, index) => (
           <motion.div 
             key={index}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="relative z-10 bg-neutral-900/50 border border-neutral-800 p-8 rounded-3xl backdrop-blur-sm"
+            className="relative z-10 bg-neutral-900/50 border border-neutral-800 p-6 sm:p-8 rounded-3xl backdrop-blur-sm"
           >
             <div className="w-12 h-12 rounded-2xl bg-black border border-neutral-700 flex items-center justify-center mb-6">
               {step.icon}
             </div>
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-sm font-mono text-purple-500 bg-purple-500/10 px-2 py-1 rounded">Step {step.number}</span>
+              <span className="text-[10px] sm:text-sm font-mono text-purple-500 bg-purple-500/10 px-2 py-1 rounded">Step {step.number}</span>
             </div>
-            <h3 className="text-xl font-bold mb-3">{step.title}</h3>
-            <p className="text-neutral-400 text-sm leading-relaxed">{step.description}</p>
+            <h3 className="text-lg sm:text-xl font-bold mb-3">{step.title}</h3>
+            <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed">{step.description}</p>
           </motion.div>
         ))}
       </div>
@@ -107,7 +107,7 @@ export default function HowItWorks() {
           Benefits
         </h2>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8">
           {benefits.map((benefit, index) => (
             <motion.div 
               key={index}
