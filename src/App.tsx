@@ -24,18 +24,16 @@ function AppContent() {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    const now = Date.now();
-    const SOCIAL_BAR_KEY = 'adsterra_socialbar_last_shown';
-    const lastSocialBar = localStorage.getItem(SOCIAL_BAR_KEY);
-    const twentyFourHours = 24 * 60 * 60 * 1000;
+    const SOCIAL_BAR_SESSION_KEY = 'adsterra_socialbar_shown_session';
+    const hasShownSocialBar = sessionStorage.getItem(SOCIAL_BAR_SESSION_KEY);
 
-    if (!lastSocialBar || (now - parseInt(lastSocialBar)) > twentyFourHours) {
+    if (!hasShownSocialBar) {
       const injectSocialBar = () => {
         const script = document.createElement('script');
         script.src = 'https://accedelid.com/36/1a/16/361a16fb9e188d3cf6b5b36adb3d1fe1.js';
         script.async = true;
         document.head.appendChild(script);
-        localStorage.setItem(SOCIAL_BAR_KEY, Date.now().toString());
+        sessionStorage.setItem(SOCIAL_BAR_SESSION_KEY, 'true');
         window.removeEventListener('click', injectSocialBar);
       };
 
