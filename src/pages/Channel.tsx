@@ -99,7 +99,7 @@ export default function Channel() {
   const totalViews = videos.reduce((acc, video) => acc + (video.views || 0), 0);
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-6xl px-2 sm:px-4 lg:px-8">
       {/* Header */}
       <div className="relative mb-8 overflow-hidden rounded-3xl bg-neutral-900 border border-neutral-800 p-8 md:p-12 shadow-2xl">
         <div className="absolute right-0 top-0 h-64 w-64 translate-x-1/2 translate-y-[-50%] rounded-full bg-purple-600/10 blur-[100px]" />

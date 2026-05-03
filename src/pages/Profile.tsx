@@ -15,7 +15,7 @@ export default function Profile() {
   const { user, profile, signOut } = useAuth();
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'videos' | 'analytics' | 'earnings'>('videos');
+  const [activeTab, setActiveTab] = useState<'videos' | 'analytics'>('videos');
   
   // Edit Profile States
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -154,7 +154,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-6xl px-2 sm:px-4 lg:px-8">
       {/* Edit Profile Modal */}
       <AnimatePresence>
         {isEditingProfile && (
@@ -329,11 +329,11 @@ export default function Profile() {
         </div>
       </div>
 
-      <div className="mb-8 flex border-b border-neutral-800">
+      <div className="mb-8 flex border-b border-neutral-800 overflow-x-auto no-scrollbar scroll-smooth">
         <button 
           onClick={() => setActiveTab('videos')}
           className={cn(
-            "flex items-center gap-2 px-8 py-4 text-sm font-black uppercase tracking-widest transition-all",
+            "flex shrink-0 items-center gap-2 px-8 py-4 text-sm font-black uppercase tracking-widest transition-all",
             activeTab === 'videos' ? "border-b-2 border-purple-500 text-purple-500" : "text-neutral-500 hover:text-white"
           )}
         >
@@ -342,23 +342,12 @@ export default function Profile() {
         <button 
           onClick={() => setActiveTab('analytics')}
           className={cn(
-            "flex items-center gap-2 px-8 py-4 text-sm font-black uppercase tracking-widest transition-all",
+            "flex shrink-0 items-center gap-2 px-8 py-4 text-sm font-black uppercase tracking-widest transition-all",
             activeTab === 'analytics' ? "border-b-2 border-purple-500 text-purple-500" : "text-neutral-500 hover:text-white"
           )}
         >
           <BarChart3 className="h-4 w-4" /> Analytics
         </button>
-        {profile?.mppJoinedAt && (
-          <button 
-            onClick={() => setActiveTab('earnings')}
-            className={cn(
-              "flex items-center gap-2 px-8 py-4 text-sm font-black uppercase tracking-widest transition-all",
-              activeTab === 'earnings' ? "border-b-2 border-purple-500 text-purple-500" : "text-neutral-500 hover:text-white"
-            )}
-          >
-            <DollarSign className="h-4 w-4" /> Earnings
-          </button>
-        )}
       </div>
 
       {activeTab === 'videos' ? (
@@ -424,36 +413,10 @@ export default function Profile() {
            <div className="md:col-span-3 p-12 rounded-3xl border border-neutral-800 bg-neutral-900/30 flex flex-col items-center justify-center text-center">
               <PlayCircle className="h-12 w-12 text-purple-500 mb-4 opacity-50" />
               <h3 className="text-xl font-black uppercase tracking-tighter mb-2">Advanced Analytics Module Pending</h3>
-              <p className="text-sm text-neutral-500 max-w-md">Deep engagement metrics and planetary heatmaps are currently in calibration. Check back after your next 10,000 views.</p>
-           </div>
-        </div>
-      ) : (
-        <div className="rounded-3xl border border-neutral-800 bg-neutral-900/50 p-12 text-center">
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-purple-600/10 text-purple-500">
-            <DollarSign className="h-10 w-10" />
-          </div>
-          <h2 className="text-3xl font-black uppercase tracking-tighter mb-4">Lunar Revenue Stream</h2>
-          <p className="text-neutral-500 mb-8 max-w-lg mx-auto font-medium">Your planetary impact is generating economic value. Monitor your balances and request payouts through the central command station.</p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto mb-8">
-            <div className="p-6 rounded-2xl bg-black/40 border border-neutral-800">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 text-left mb-1">Current Balance</p>
-              <p className="text-2xl sm:text-3xl font-black text-white text-left">{formatCurrency(profile?.earningsBalance || 0)}</p>
+               <p className="text-sm text-neutral-500 max-w-md">Deep engagement metrics and planetary heatmaps are currently in calibration. Check back after your next 10,000 views.</p>
             </div>
-            <div className="p-6 rounded-2xl bg-black/40 border border-neutral-800">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 text-left mb-1">Lifetime RPM</p>
-              <p className="text-3xl font-black text-white text-left">$0.500</p>
-            </div>
-          </div>
-
-          <Link 
-            to="/mpp" 
-            className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-10 py-4 font-black uppercase tracking-widest text-white shadow-xl mpp-glow hover:bg-purple-500 transition-all active:scale-95"
-          >
-            Open Earnings Command <TrendingUp className="h-5 w-5" />
-          </Link>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

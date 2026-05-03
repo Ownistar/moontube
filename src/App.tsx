@@ -56,7 +56,7 @@ function AppContent() {
       <Navbar />
       <div className="flex flex-1 overflow-hidden pb-16 md:pb-0">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 lg:p-8">
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Home />} />

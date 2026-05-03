@@ -30,7 +30,7 @@ export default function HowItWorks() {
       description: "No requirements, no wait lists. Start earning from day one."
     },
     {
-      title: "$0.500 Fixed RPM for ALL CONTENT",
+      title: "$0.50 Fixed RPM for ALL CONTENT",
       description: "Industry leading rates for Shorts and Long-form videos."
     },
     {
@@ -54,7 +54,7 @@ export default function HowItWorks() {
           How it Works
         </h1>
         <p className="text-xl text-neutral-400 leading-relaxed max-w-2xl mx-auto">
-          Stop waiting for 4,000 watch hours. Paste your YouTube links and start earning a fixed $0.500 RPM on every view, including Shorts.
+          Stop waiting for 4,000 watch hours. Paste your YouTube links and start earning a fixed $0.50 RPM on every view, including Shorts.
         </p>
       </motion.div>
 
