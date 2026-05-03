@@ -76,7 +76,7 @@ export default function MPPDashboard() {
       <header className="mb-12 flex items-center justify-between">
         <div>
           <h1 className="text-4xl font-black italic tracking-tighter uppercase text-purple-500">Creator Moon Station</h1>
-          <p className="text-white/40">Real-time earnings tracking with fixed $0.50 RPM</p>
+          <p className="text-white/40">Real-time earnings tracking with fixed $0.500 RPM</p>
         </div>
         <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#8B5CF6] text-white shadow-[0_0_40px_rgba(139,92,246,0.3)]">
           <DollarSign className="h-8 w-8" />

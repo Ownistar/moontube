@@ -7,7 +7,7 @@ import { Video, CATEGORIES } from '../types';
 import VideoCard from '../components/video/VideoCard';
 import { User, Film, BarChart3, Settings, Edit2, Trash2, X, Check, Save, TrendingUp, Users, PlayCircle, AlertTriangle, Zap, DollarSign, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { cn, formatDate } from '../lib/utils';
+import { cn, formatDate, formatCurrency } from '../lib/utils';
 import { Link } from 'react-router-dom';
 import { handleFirestoreError, OperationType } from '../lib/firebase';
 
@@ -438,11 +438,11 @@ export default function Profile() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto mb-8">
             <div className="p-6 rounded-2xl bg-black/40 border border-neutral-800">
               <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 text-left mb-1">Current Balance</p>
-              <p className="text-2xl sm:text-3xl font-black text-white text-left">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(profile?.earningsBalance || 0)}</p>
+              <p className="text-2xl sm:text-3xl font-black text-white text-left">{formatCurrency(profile?.earningsBalance || 0)}</p>
             </div>
             <div className="p-6 rounded-2xl bg-black/40 border border-neutral-800">
               <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 text-left mb-1">Lifetime RPM</p>
-              <p className="text-3xl font-black text-white text-left">$0.50</p>
+              <p className="text-3xl font-black text-white text-left">$0.500</p>
             </div>
           </div>
 

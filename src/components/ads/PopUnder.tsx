@@ -4,7 +4,7 @@ const POPUNDER_KEY = 'mpp_pu_last_shown';
 const CLICK_COUNT_KEY = 'mpp_pu_clicks';
 const INJECTED_THIS_SESSION = 'mpp_pu_injected';
 const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
-const TRIGGER_CLICK_COUNT = 6;
+const TRIGGER_CLICK_COUNT = 2;
 
 export default function PopUnder() {
   useEffect(() => {
@@ -33,8 +33,7 @@ export default function PopUnder() {
       const newClicks = currentClicks + 1;
       localStorage.setItem(CLICK_COUNT_KEY, newClicks.toString());
 
-      // Trigger sequence: Load and arm on the 6th click
-      // The script will likely fire the actual popunder on the 7th click.
+      // Trigger sequence: Load and arm on the 2nd click
       if (newClicks >= TRIGGER_CLICK_COUNT) {
         // Mark as shown for the next 24 hours immediately
         localStorage.setItem(POPUNDER_KEY, currentTime.toString());

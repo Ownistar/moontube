@@ -25,18 +25,22 @@ function AppContent() {
 
   useEffect(() => {
     const now = Date.now();
-
-    // Frequency cap for social bar: 5 hours
     const SOCIAL_BAR_KEY = 'adsterra_socialbar_last_shown';
     const lastSocialBar = localStorage.getItem(SOCIAL_BAR_KEY);
-    const fiveHours = 5 * 60 * 60 * 1000;
+    const twentyFourHours = 24 * 60 * 60 * 1000;
 
-    if (!lastSocialBar || (now - parseInt(lastSocialBar)) > fiveHours) {
-      const script = document.createElement('script');
-      script.src = 'https://accedelid.com/36/1a/16/361a16fb9e188d3cf6b5b36adb3d1fe1.js';
-      script.async = true;
-      document.head.appendChild(script);
-      localStorage.setItem(SOCIAL_BAR_KEY, now.toString());
+    if (!lastSocialBar || (now - parseInt(lastSocialBar)) > twentyFourHours) {
+      const injectSocialBar = () => {
+        const script = document.createElement('script');
+        script.src = 'https://accedelid.com/36/1a/16/361a16fb9e188d3cf6b5b36adb3d1fe1.js';
+        script.async = true;
+        document.head.appendChild(script);
+        localStorage.setItem(SOCIAL_BAR_KEY, Date.now().toString());
+        window.removeEventListener('click', injectSocialBar);
+      };
+
+      window.addEventListener('click', injectSocialBar);
+      return () => window.removeEventListener('click', injectSocialBar);
     }
   }, []);
 

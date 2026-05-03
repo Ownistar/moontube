@@ -741,13 +741,17 @@ export default function Watch() {
             <div className="bg-purple-600 p-4 rounded-2xl text-white font-black text-sm shadow-xl mpp-glow">MPP</div>
             <div>
               <p className="font-black text-purple-400 uppercase tracking-tighter text-xl">Moon Partner Program</p>
-              <p className="text-xs text-purple-500/60 font-bold uppercase tracking-widest mt-1">Creator earns {formatCurrency(EARNINGS_PER_VIEW)} per unique view.</p>
+              <p className="text-xs text-purple-500/60 font-bold uppercase tracking-widest mt-1">Monetize From Day One</p>
             </div>
           </div>
           <Link to="/mpp" className="relative z-10 rounded-full bg-purple-600 px-8 py-3 text-xs font-black text-white hover:bg-purple-700 transition-all shadow-xl mpp-glow active:scale-95 uppercase tracking-widest">
             Partner Portal
           </Link>
         </motion.div>
+
+        <div className="mt-8">
+          <NativeAd />
+        </div>
       </div>
 
       <div className="flex w-full flex-col gap-6 lg:w-96">
@@ -761,8 +765,6 @@ export default function Watch() {
             <VideoCard key={v.id} video={v} />
           ))}
         </div>
-
-        <NativeAd />
       </div>
     </div>
   );

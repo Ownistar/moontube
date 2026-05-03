@@ -61,7 +61,7 @@ export default function Login() {
               <p className="text-sm text-white/60 mb-8 px-4">
                 {mode === 'login' 
                   ? 'Sign in to access your dashboard, library, and subscriptions.' 
-                  : 'Start your journey as a MoonTube creator. Earn $0.50 RPM from view one.'}
+                  : 'Start your journey as a MoonTube creator. Earn $0.500 RPM from view one.'}
               </p>
             </motion.div>
           </AnimatePresence>
@@ -77,7 +77,7 @@ export default function Login() {
           
           <div className="mt-8 grid grid-cols-3 gap-6 text-center border-t border-white/5 pt-8">
             <div>
-              <p className="text-lg font-bold">$0.50</p>
+              <p className="text-lg font-bold">$0.500</p>
               <p className="text-[9px] font-black uppercase tracking-widest text-white/30">Fixed RPM</p>
             </div>
             <div>

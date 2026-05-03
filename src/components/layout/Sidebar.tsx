@@ -64,7 +64,7 @@ export default function Sidebar() {
       
       <div className="mt-auto px-4 py-4 text-[10px] text-white/20">
         <p>&copy; 2026 MoonTube LLC</p>
-        <p>RPM: $0.50 Guaranteed</p>
+        <p>RPM: $0.500 Guaranteed</p>
       </div>
     </aside>
   );
