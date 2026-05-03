@@ -593,21 +593,23 @@ export default function Watch() {
           <div className="mt-6 flex flex-wrap items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               <Link to={`/channel/${video.ownerId}`} className="flex items-center gap-4 group">
-                <div className="h-12 w-12 overflow-hidden rounded-full ring-2 ring-neutral-800 bg-neutral-900 shadow-xl transition-transform group-hover:scale-105">
+                <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full ring-2 ring-neutral-800 bg-neutral-900 shadow-xl transition-transform group-hover:scale-105">
                   {video.ownerPhoto ? (
                     <img src={video.ownerPhoto} alt={video.ownerName} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-xs font-black text-purple-500">M</div>
                   )}
                 </div>
-                <div>
-                  <div className="flex items-baseline gap-2">
-                    <p className="font-black uppercase tracking-tight text-lg group-hover:text-purple-400 transition-colors">{video.ownerName || 'Unknown Astronaut'}</p>
+                <div className="min-w-0">
+                  <div className="flex items-center flex-wrap sm:flex-nowrap gap-x-3 gap-y-0.5">
+                    <p className="font-black uppercase tracking-tight text-base sm:text-lg whitespace-nowrap overflow-hidden text-ellipsis group-hover:text-purple-400 transition-colors">
+                      {video.ownerName || 'Unknown Astronaut'}
+                    </p>
                     {channelInfo !== null && (
-                      <span className="text-[10px] font-bold text-neutral-500 mb-0.5">{formatViews(channelInfo.subscriberCount)} followers</span>
+                      <span className="text-[10px] flex-shrink-0 font-bold text-neutral-500">{formatViews(channelInfo.subscriberCount)} followers</span>
                     )}
                   </div>
-                  <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest">Moon Partner • Instant Access</p>
+                  <p className="text-[9px] text-neutral-500 font-bold uppercase tracking-widest">Moon Partner • Instant Access</p>
                 </div>
               </Link>
               {user && video.ownerId !== user.uid && (
